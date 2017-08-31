@@ -86,5 +86,38 @@ class ShowTestSuite(unittest.TestCase):
         self.assertEqual('UTC', s.endtime.tzinfo.zone)
 
 
+    def test_end_date_not_before_start_date(self):
+        """Test that an end date can't be before a start date"""
+        s = show.Show()
+
+        st = datetime.datetime(2017,8,30,22,0,0,0,pytz.utc)
+        et = datetime.datetime(2017,8,30,21,0,0,0,pytz.utc)
+
+        s.starttime = st
+
+        with self.assertRaises(show.ShowError) as cm:
+            s.endtime = et
+
+        e = "endtime {0} has to be > than starttime {1}".format(et, st)
+        self.assertEqual(e, cm.exception.message)
+
+
+    def test_start_date_after_end_date(self):
+        """Test that a start date can't be after and end date"""
+        s = show.Show()
+
+        st = datetime.datetime(2017,8,30,22,0,0,0,pytz.utc)
+        et = datetime.datetime(2017,8,30,21,0,0,0,pytz.utc)
+
+        s.endtime = et
+
+        with self.assertRaises(show.ShowError) as cm:
+            s.starttime = st
+
+        e = "starttime {0} has to be < than endtime {1}".format(st, et)
+        self.assertEqual(e, cm.exception.message)
+
+
+
 if __name__ == '__main__':
     unittest.main()

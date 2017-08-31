@@ -79,8 +79,8 @@ class Show(object):
         starttime = starttime.astimezone(pytz.utc)
 
         if self.endtime is not None and starttime > self.endtime:
-            raise ShowError("starttime %s has to be < than endtime %s" %
-                            starttime, self.endtime)
+            msg = "starttime {0} has to be < than endtime {1}"
+            raise ShowError(msg.format(starttime, self.endtime))
 
         self._starttime = starttime
 
@@ -116,8 +116,8 @@ class Show(object):
         endtime = endtime.astimezone(pytz.utc)
 
         if self.starttime is not None and endtime < self.starttime:
-            raise ShowError("endtime %s has to be > than starttime %s" %
-                            endtime, self.starttime)
+            msg = "endtime {0} has to be > than starttime {1}"
+            raise ShowError(msg.format(endtime, self.starttime))
 
         self._endtime = endtime
 
