@@ -1,6 +1,8 @@
+"""Show module for broadcast shows"""
+
 import datetime
-import pytz
 import uuid
+import pytz
 
 class ShowError(Exception):
     """Show related exception"""
@@ -27,7 +29,7 @@ class Show(object):
                "I'm on-air right now!"
     """
 
-    def __init__(self, name=None, uuid=str(uuid.uuid4())):
+    def __init__(self, name=None, uid=uuid.uuid4()):
         """Constructor for the show
 
         :param str: The name of the show
@@ -36,7 +38,7 @@ class Show(object):
 
         self.name = name #: The show's name
 
-        self.uuid = uuid #: The show's global unique identifier
+        self.uid = uid #: The show's global unique identifier (UUID)
 
         self.description = None #: The show's description
 
@@ -128,11 +130,8 @@ class Show(object):
         :return: True if the show has started, otherwise False
         :rtype: bool
         """
-        if self._starttime is not None and \
-           datetime.datetime.now(pytz.utc) > self._starttime:
-            return True
-        else:
-            return False
+        return bool(self._starttime is not None and \
+                    datetime.datetime.now(pytz.utc) > self._starttime)
 
 
     def ended(self):
@@ -141,11 +140,8 @@ class Show(object):
         :return: True if the show has ended, otherwise False
         :rtype: bool
         """
-        if self._endtime is not None and \
-           datetime.datetime.now(pytz.utc) > self._endtime:
-            return True
-        else:
-            return False
+        return bool(self._endtime is not None and \
+                    datetime.datetime.now(pytz.utc) > self._endtime)
 
 
     def active(self):
@@ -156,10 +152,7 @@ class Show(object):
         :return: True if the show is active, otherwise False
         :rtype: bool
         """
-        if self.started() and not self.ended():
-            return True
-        else:
-            return False
+        return bool(self.started() and not self.ended())
 
 
     def __str__(self):
@@ -170,4 +163,4 @@ class Show(object):
         :rtype: str
         """
         return "Show '%s' (%s), start: '%s', end: '%s', url: %s" \
-                % (self.name, self.uuid, self.starttime, self.endtime, self.url)
+                % (self.name, self.uid, self.starttime, self.endtime, self.url)
