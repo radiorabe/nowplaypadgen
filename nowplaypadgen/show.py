@@ -13,6 +13,7 @@ class Show(object):
     """Show class which represents a specific broadcast show
 
        Example::
+
            sh = Show('My Show')
 
            # Optional show parameters
@@ -63,7 +64,7 @@ class Show(object):
     def starttime(self, starttime):
         """Setter for starttime which checks for a TZ aware datetime object
 
-        :param datetime.datetime: The start time of the show
+        :param datetime.datetime starttime: The start time of the show
         :raises ShowError: when starttime is not a datetime object or
                            is TZ unaware (naive)
         """
@@ -101,7 +102,7 @@ class Show(object):
     def endtime(self, endtime):
         """Setter for endtime which checks for a TZ aware datetime object
 
-        :param datetime.datetime: The end time of the show
+        :param datetime.datetime endtime: The end time of the show
         :raises ShowError: when endtime is not a datetime object or
                            is TZ unaware (naive)
         """
@@ -127,7 +128,7 @@ class Show(object):
     def started(self):
         """Checks if the show has started
 
-        :return: True if the show has started, otherwise False
+        :return: ``True`` if the show has started, otherwise ``False``
         :rtype: bool
         """
         return bool(self._starttime is not None and \
@@ -137,7 +138,7 @@ class Show(object):
     def ended(self):
         """Checks if the show has ended
 
-        :return: True if the show has ended, otherwise False
+        :return: ``True`` if the show has ended, otherwise ``False``
         :rtype: bool
         """
         return bool(self._endtime is not None and \
@@ -149,7 +150,7 @@ class Show(object):
 
         An active show is defined as one that has started but not ended yet.
 
-        :return: True if the show is active, otherwise False
+        :return: ``True`` if the show is active, otherwise ``False``
         :rtype: bool
         """
         return bool(self.started() and not self.ended())
