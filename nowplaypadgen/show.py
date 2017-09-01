@@ -132,7 +132,7 @@ class Show(object):
         :rtype: bool
         """
         return bool(self._starttime is not None and \
-                    datetime.datetime.now(pytz.utc) > self._starttime)
+                    datetime.datetime.now(pytz.utc) >= self._starttime)
 
 
     def ended(self):
@@ -142,7 +142,7 @@ class Show(object):
         :rtype: bool
         """
         return bool(self._endtime is not None and \
-                    datetime.datetime.now(pytz.utc) > self._endtime)
+                    datetime.datetime.now(pytz.utc) >= self._endtime)
 
 
     def active(self):

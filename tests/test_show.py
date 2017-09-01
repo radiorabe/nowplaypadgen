@@ -122,6 +122,54 @@ class ShowTestSuite(unittest.TestCase):
         self.assertEqual(error, context_manager.exception.message)
 
 
+    def test_show_has_started(self):
+        """Test that a show has started"""
+        sho = show.Show()
+        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        sho.starttime = now
+        sho.endtime = now + datetime.timedelta(hours=1) # plus one hour
+
+        self.assertTrue(sho.active())
+        self.assertTrue(sho.started())
+        self.assertFalse(sho.ended())
+
+
+    def test_show_has_not_started(self):
+        """Test that a show hasn't started yet"""
+        sho = show.Show()
+        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        sho.starttime = now + datetime.timedelta(hours=1) # plus one hour
+        sho.endtime   = now + datetime.timedelta(hours=2) # plus two hours
+        self.assertFalse(sho.active())
+        self.assertFalse(sho.started())
+        self.assertFalse(sho.ended())
+
+
+    def test_show_has_ended(self):
+        """Test that a show has ended"""
+        sho = show.Show()
+        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        sho.starttime = now - datetime.timedelta(hours=2) # minus two hours
+        sho.endtime   = now - datetime.timedelta(hours=1) # minus one hour
+        self.assertFalse(sho.active())
+        self.assertTrue(sho.started())
+        self.assertTrue(sho.ended())
+
+
+    def test_show_has_not_ended(self):
+        """Test that a show hasn't ended yet"""
+        sho = show.Show()
+        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        sho.starttime = now
+        sho.endtime   = now + datetime.timedelta(hours=1) # plus one hour
+        self.assertTrue(sho.active())
+        self.assertTrue(sho.started())
+        self.assertFalse(sho.ended())
+
 
 if __name__ == '__main__':
     unittest.main()
