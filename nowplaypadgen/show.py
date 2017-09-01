@@ -156,6 +156,19 @@ class Show(object):
         return bool(self.started() and not self.ended())
 
 
+    def get_duration(self):
+        """Get the duration (time delta) of a show
+
+        Returns the duration of a show as a :class:datetime.timedelta object.
+        Note, that the duration is stored in days, seconds and microseconds in
+        such an object.
+
+        :return: The duration (time delta) of a show
+        :rtype: datetime.timedelta
+        """
+        return self.endtime - self.starttime
+
+
     def __str__(self):
         """Returns a string representation of the show, useful for logging
 

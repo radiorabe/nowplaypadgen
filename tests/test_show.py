@@ -171,5 +171,20 @@ class ShowTestSuite(unittest.TestCase):
         self.assertFalse(sho.ended())
 
 
+    def test_show_duration(self):
+        """Test the duration (time delta) of a show"""
+        sho = show.Show()
+        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+        # The show runs for one hour
+        sho.starttime = now
+        sho.endtime   = now + datetime.timedelta(hours=1)
+
+        expected_delta = datetime.timedelta(0,3600)
+
+        self.assertEqual(sho.get_duration(), expected_delta)
+
+
+
 if __name__ == '__main__':
     unittest.main()
