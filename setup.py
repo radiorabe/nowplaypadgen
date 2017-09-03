@@ -25,6 +25,7 @@ INSTALL_REQUIRES = [
 
 TESTS_REQUIRE = [
     'pytest~=3.2.1',
+    'pytest-pylint~=0.7.1'
 ]
 
 ENTRY_POINTS = {
