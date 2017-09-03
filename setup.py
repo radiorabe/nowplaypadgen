@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 import os
 import re
+import sys
 
 def readme():
     with open('README.rst') as f:
@@ -16,12 +17,16 @@ def get_version():
             return mo.group(1)
     raise RuntimeError('Unable to find version string in %s.' % VERSIONFILE)
 
+def pytest_runner():
+    """Require pytest-runner for invocations of setup.py that will invoke it."""
+    needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+    return ['pytest-runner~=2.11.1'] if needs_pytest else []
+
 INSTALL_REQUIRES = [
     'pytz>=2017.02',
     'setuptools~=28.8.0',
-    'pytest-runner~=2.11.1',
     'markdown',
-]
+] + pytest_runner()
 
 TESTS_REQUIRE = [
     'pytest~=3.2.1',
