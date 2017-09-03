@@ -1,21 +1,28 @@
-from setuptools import setup, find_packages
+"""DAB+ now playing PAG (DLS+ and MOT SLS generator)"""
+
 import os
 import re
 import sys
 
+from setuptools import setup, find_packages
+
+
 def readme():
-    with open('README.rst') as f:
-        return f.read()
+    """Load README.rst file for description"""
+    with open('README.rst') as readme_file:
+        return readme_file.read()
+
 
 def get_version():
-    VERSIONFILE = os.path.join('nowplaypadgen', '__init__.py')
-    initfile_lines = open(VERSIONFILE, 'rt').readlines()
-    VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+    """Get version from main module"""
+    version_file = os.path.join('nowplaypadgen', '__init__.py')
+    initfile_lines = open(version_file, 'rt').readlines()
     for line in initfile_lines:
-        mo = re.search(VSRE, line, re.M)
-        if mo:
-            return mo.group(1)
-    raise RuntimeError('Unable to find version string in %s.' % VERSIONFILE)
+        matches = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", line, re.M)
+        if matches:
+            return matches.group(1)
+    raise RuntimeError('Unable to find version string in %s.' % version_file)
+
 
 def pytest_runner():
     """Require pytest-runner for invocations of setup.py that will invoke it."""
@@ -42,7 +49,7 @@ ENTRY_POINTS = {
 setup(
     name='nowplaypadgen',
     version=get_version(),
-    description='DAB+ now playing PAD (DLS+ and MOT SLS) generator',
+    description=__doc__,
     long_description=readme(),
     url='https://github.com/radiorabe/nowplaypadgen',
     author='Christian Affolter',
