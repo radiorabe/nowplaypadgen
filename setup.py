@@ -16,6 +16,23 @@ def get_version():
             return mo.group(1)
     raise RuntimeError('Unable to find version string in %s.' % VERSIONFILE)
 
+INSTALL_REQUIRES = [
+    'pytz>=2017.02',
+    'setuptools~=28.8.0',
+    'pytest-runner~=2.11.1',
+    'markdown',
+]
+
+TESTS_REQUIRE = [
+    'pytest~=3.2.1',
+]
+
+ENTRY_POINTS = {
+    'console_scripts': [
+        'nowplay-padgen = nowplaypadgen.__main__:main'
+    ]
+}
+
 setup(
     name='nowplaypadgen',
     version=get_version(),
@@ -26,14 +43,10 @@ setup(
     author_email='c.affolter@purplehaze.ch',
     license='AGPL',
     packages=find_packages(),
-    install_requires=[
-        'markdown',
-    ],
+    install_requires=INSTALL_REQUIRES,
+    tests_require=TESTS_REQUIRE,
     test_suite='tests',
     include_package_data=True,
-    entry_points = {
-        'console_scripts': [
-            'nowplay-padgen = nowplaypadgen.__main__:main']
-    },
+    entry_points=ENTRY_POINTS,
     zip_safe=False
 )
