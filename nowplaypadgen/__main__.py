@@ -1,40 +1,44 @@
-import nowplaypadgen
+"""Main entrypoint for interacting with nowplaypadgen"""
+
 import argparse
 import logging
 import os
 import sys
 
+import nowplaypadgen
 
-logger = logging.getLogger(__name__)
 
 def parse_arguments():
+    """Parse arguments passed by user"""
     parser = argparse.ArgumentParser(
-        description='DAB+ now playing PAD (DLS+ and MOT SLS) generator'
+        description=nowplaypadgen.__doc__
     )
 
     default_config = os.path.dirname(__file__) + '../nowplaypadgen.conf'
 
-    parser.add_argument('-c', '--config', action='store', 
+    parser.add_argument('-c', '--config', action='store',
                         default=default_config,
                         help='Configuration file to use')
 
-    parser.add_argument('-s', '--show', action='store', 
+    parser.add_argument('-s', '--show', action='store',
                         help='The name of the show')
 
-    parser.add_argument('-a', '--artist', action='store', 
+    parser.add_argument('-a', '--artist', action='store',
                         help='The name of the artist')
 
-    parser.add_argument('-t', '--title', action='store', 
+    parser.add_argument('-t', '--title', action='store',
                         help='The title of the currently playing track')
 
     parser.add_argument('-v', '--version', action='version',
                         version=nowplaypadgen.__version__,
                         help='Display the version')
 
-    args = parser.parse_args()
+    parser.parse_args()
 
 
 def setup_logging():
+    """Prepare logger"""
+    logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
     stream_handler = logging.StreamHandler(stream=sys.stdout)
@@ -45,10 +49,12 @@ def setup_logging():
 
     logger.addHandler(stream_handler)
     logger.error('test')
+    return logger
 
 
 def main():
-    setup_logging()
+    """Application entrypoint"""
+    logger = setup_logging()
     parse_arguments()
     logger.info('hello world')
 

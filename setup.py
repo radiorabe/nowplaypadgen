@@ -1,8 +1,10 @@
-"""DAB+ now playing PAG (DLS+ and MOT SLS generator)"""
+"""setuptools config for nowplaypadgen"""
 
 import os
 import re
 import sys
+
+import nowplaypadgen
 
 from setuptools import setup, find_packages
 
@@ -49,7 +51,7 @@ ENTRY_POINTS = {
 setup(
     name='nowplaypadgen',
     version=get_version(),
-    description=__doc__,
+    description=nowplaypadgen.__doc__,
     long_description=readme(),
     url='https://github.com/radiorabe/nowplaypadgen',
     author='Christian Affolter',

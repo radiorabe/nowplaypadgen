@@ -4,6 +4,7 @@ import datetime
 import uuid
 import pytz
 
+
 class ShowError(Exception):
     """Show related exception"""
     pass
@@ -36,18 +37,17 @@ class Show(object):
         :param str: The UUID of the show
         """
 
-        self.name = name #: The show's name
+        self.name = name  # : The show's name
 
-        self.uid = uid #: The show's global unique identifier (UUID)
+        self.uid = uid  # : The show's global unique identifier (UUID)
 
-        self.description = None #: The show's description
+        self.description = None  # : The show's description
 
-        self.url = None #: The show's URL
+        self.url = None  # : The show's URL
 
-        self._starttime = None #: The show's start time, initially set to None
+        self._starttime = None  # : The show's start time, initially set to None
 
-        self._endtime = None #: The show's end time, initially set to None
-
+        self._endtime = None  # : The show's end time, initially set to None
 
     @property
     def starttime(self):
@@ -57,7 +57,6 @@ class Show(object):
         :rtype: datetime.datetime
         """
         return self._starttime
-
 
     @starttime.setter
     def starttime(self, starttime):
@@ -86,7 +85,6 @@ class Show(object):
 
         self._starttime = starttime
 
-
     @property
     def endtime(self):
         """Getter for endtime
@@ -95,7 +93,6 @@ class Show(object):
         :rtype: datetime.datetime
         """
         return self._endtime
-
 
     @endtime.setter
     def endtime(self, endtime):
@@ -123,7 +120,6 @@ class Show(object):
 
         self._endtime = endtime
 
-
     def started(self):
         """Checks if the show has started
 
@@ -132,7 +128,6 @@ class Show(object):
         """
         return bool(self._starttime is not None and \
                     datetime.datetime.now(pytz.utc) > self._starttime)
-
 
     def ended(self):
         """Checks if the show has ended
@@ -143,7 +138,6 @@ class Show(object):
         return bool(self._endtime is not None and \
                     datetime.datetime.now(pytz.utc) > self._endtime)
 
-
     def active(self):
         """Checks if the show is active
 
@@ -153,7 +147,6 @@ class Show(object):
         :rtype: bool
         """
         return bool(self.started() and not self.ended())
-
 
     def __str__(self):
         """Returns a string representation of the show, useful for logging
