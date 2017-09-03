@@ -1,121 +1,112 @@
-import os
-import sys
-import unittest
+"""Tests for show related classes"""
 
+import unittest
 import datetime
+
 import pytz
 
-# Load the module locally from the dev environment.
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from nowplaypadgen import show
-
 
 class ShowTestSuite(unittest.TestCase):
     """Show test cases."""
 
     def test_show_name_assignment(self):
         """Test the show name assignment"""
-        show_name="My Show Name"
+        show_name = "My Show Name"
 
-        s = show.Show(show_name)
-        self.assertEqual(show_name, s.name)
-
+        my_show = show.Show(show_name)
+        self.assertEqual(show_name, my_show.name)
 
     def test_date_assignment(self):
         """Test the time setter and getter decorators"""
-        s = show.Show()
+        my_show = show.Show()
 
-        s.starttime = datetime.datetime(2017,8,30,21,0,0,0,pytz.utc)
-        self.assertIsInstance(s.starttime, datetime.datetime)
+        my_show.starttime = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
+        self.assertIsInstance(my_show.starttime, datetime.datetime)
 
-        s.endtime = datetime.datetime(2017,8,30,22,0,0,0,pytz.utc)
-        self.assertIsInstance(s.endtime, datetime.datetime)
+        my_show.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
+        self.assertIsInstance(my_show.endtime, datetime.datetime)
 
-
-    def test_date_must_be_datetime_object(self):
+    def test_is_date_datetime_object(self):
         """Test if none datetime objects will be refused"""
-        s = show.Show()
+        my_show = show.Show()
 
-        with self.assertRaises(show.ShowError) as cm:
-            s.starttime = "Not a datetime.datetime object"
+        with self.assertRaises(show.ShowError) as my_show_error:
+            my_show.starttime = "Not a datetime.datetime object"
 
         self.assertEqual('starttime has to be a datetime object',
-                        str(cm.exception))
+                         str(my_show_error.exception))
 
-        with self.assertRaises(show.ShowError) as cm:
-            s.endtime = "Not a datetime.datetime object"
+        with self.assertRaises(show.ShowError) as my_show_error:
+            my_show.endtime = "Not a datetime.datetime object"
 
         self.assertEqual('endtime has to be a datetime object',
-                        str(cm.exception))
+                         str(my_show_error.exception))
 
-
-    def test_date_must_be_timezone_aware(self):
+    def test_is_date_timezone_aware(self):
         """Test if none TZ aware datetime objects will be refused"""
-        s = show.Show()
+        my_show = show.Show()
 
-        with self.assertRaises(show.ShowError) as cm:
-            s.starttime = datetime.datetime(2017,8,30,21,0,0,0)
+        with self.assertRaises(show.ShowError) as my_show_error:
+            my_show.starttime = datetime.datetime(2017, 8, 30, 21, 0, 0, 0)
 
         self.assertEqual('starttime has to be a TZ aware datetime object',
-                        str(cm.exception))
+                         str(my_show_error.exception))
 
-        with self.assertRaises(show.ShowError) as cm:
-            s.endtime = datetime.datetime(2017,8,30,22,0,0,0)
+        with self.assertRaises(show.ShowError) as my_show_error:
+            my_show.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0)
 
         self.assertEqual('endtime has to be a TZ aware datetime object',
-                        str(cm.exception))
-
+                         str(my_show_error.exception))
 
     def test_start_date_utc_conversion(self):
         """Test if datetime objects will be converted to UTC"""
-        s = show.Show()
+        my_show = show.Show()
 
         # Create localized start and end times
         zone_name = 'Europe/Zurich'
-        tz = pytz.timezone(zone_name)
-        st = tz.localize(datetime.datetime(2017,8,30,21,0,0,0))
-        et = tz.localize(datetime.datetime(2017,8,30,22,0,0,0))
-        self.assertEqual(zone_name, st.tzinfo.zone)
-        self.assertEqual(zone_name, et.tzinfo.zone)
+        time_zone = pytz.timezone(zone_name)
+        start_date = time_zone.localize(datetime.datetime(2017, 8, 30, 21, 0, 0, 0))
+        end_date = time_zone.localize(datetime.datetime(2017, 8, 30, 22, 0, 0, 0))
+        self.assertEqual(zone_name, start_date.tzinfo.zone)
+        self.assertEqual(zone_name, end_date.tzinfo.zone)
 
-        s.starttime = st
-        s.endtime = et
+        my_show.starttime = start_date
+        my_show.endtime = end_date
 
         # Start and end times must be converted to UTC internally
-        self.assertEqual('UTC', s.starttime.tzinfo.zone)
-        self.assertEqual('UTC', s.endtime.tzinfo.zone)
+        self.assertEqual('UTC', my_show.starttime.tzinfo.zone)
+        self.assertEqual('UTC', my_show.endtime.tzinfo.zone)
 
-
-    def test_end_date_not_before_start_date(self):
+    def test_start_date_before_end_date(self):
         """Test that an end date can't be before a start date"""
-        s = show.Show()
+        my_show = show.Show()
 
-        st = datetime.datetime(2017,8,30,22,0,0,0,pytz.utc)
-        et = datetime.datetime(2017,8,30,21,0,0,0,pytz.utc)
+        start_date = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
+        end_date = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
 
-        s.starttime = st
+        my_show.starttime = start_date
 
-        with self.assertRaises(show.ShowError) as cm:
-            s.endtime = et
+        with self.assertRaises(show.ShowError) as my_show_error:
+            my_show.endtime = end_date
 
-        e = "endtime {0} has to be > than starttime {1}".format(et, st)
-        self.assertEqual(e, str(cm.exception))
-
+        error = "endtime {0} has to be > than starttime {1}".format(end_date, start_date)
+        self.assertEqual(error, str(my_show_error.exception))
 
     def test_start_date_after_end_date(self):
         """Test that a start date can't be after and end date"""
-        s = show.Show()
+        my_show = show.Show()
 
-        st = datetime.datetime(2017,8,30,22,0,0,0,pytz.utc)
-        et = datetime.datetime(2017,8,30,21,0,0,0,pytz.utc)
+        start_date = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
+        end_date = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
 
-        s.endtime = et
+        my_show.endtime = end_date
 
-        with self.assertRaises(show.ShowError) as cm:
-            s.starttime = st
+        with self.assertRaises(show.ShowError) as my_show_error:
+            my_show.starttime = start_date
 
-        e = "starttime {0} has to be < than endtime {1}".format(st, et)
-        self.assertEqual(e, str(cm.exception))
+        error = "starttime {0} has to be < than endtime {1}".format(start_date, end_date)
+        self.assertEqual(error, str(my_show_error.exception))
 
 
 
