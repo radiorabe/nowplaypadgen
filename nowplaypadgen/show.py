@@ -31,7 +31,7 @@ class Show(object):
     """
 
     # pylint: disable=too-many-instance-attributes
-    # More than eight are reasonable since this is the main module
+    # More than eight are reasonable since this is the main model
 
     def __init__(self, name=None, uid=uuid.uuid4()):
         """Constructor for the show
