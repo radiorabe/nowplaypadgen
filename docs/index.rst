@@ -10,11 +10,6 @@ Welcome to nowplaypadgen's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-.. automodule:: nowplaypadgen.show
-   :members:
-   :undoc-members:
-
-
 
 
 Indices and tables
