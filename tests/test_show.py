@@ -40,13 +40,13 @@ class ShowTestSuite(unittest.TestCase):
             s.starttime = "Not a datetime.datetime object"
 
         self.assertEqual('starttime has to be a datetime object',
-                        cm.exception.message)
+                        str(cm.exception))
 
         with self.assertRaises(show.ShowError) as cm:
             s.endtime = "Not a datetime.datetime object"
 
         self.assertEqual('endtime has to be a datetime object',
-                        cm.exception.message)
+                        str(cm.exception))
 
 
     def test_date_must_be_timezone_aware(self):
@@ -57,13 +57,13 @@ class ShowTestSuite(unittest.TestCase):
             s.starttime = datetime.datetime(2017,8,30,21,0,0,0)
 
         self.assertEqual('starttime has to be a TZ aware datetime object',
-                        cm.exception.message)
+                        str(cm.exception))
 
         with self.assertRaises(show.ShowError) as cm:
             s.endtime = datetime.datetime(2017,8,30,22,0,0,0)
 
         self.assertEqual('endtime has to be a TZ aware datetime object',
-                        cm.exception.message)
+                        str(cm.exception))
 
 
     def test_start_date_utc_conversion(self):
@@ -99,7 +99,7 @@ class ShowTestSuite(unittest.TestCase):
             s.endtime = et
 
         e = "endtime {0} has to be > than starttime {1}".format(et, st)
-        self.assertEqual(e, cm.exception.message)
+        self.assertEqual(e, str(cm.exception))
 
 
     def test_start_date_after_end_date(self):
@@ -115,7 +115,7 @@ class ShowTestSuite(unittest.TestCase):
             s.starttime = st
 
         e = "starttime {0} has to be < than endtime {1}".format(st, et)
-        self.assertEqual(e, cm.exception.message)
+        self.assertEqual(e, str(cm.exception))
 
 
 
