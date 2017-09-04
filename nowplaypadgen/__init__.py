@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 # Prevent "TypeError: Item in ``from list'' not a string" due to
 # unicode_literals
-__all__ = [str('show'), str('timeperiod')]
+__all__ = [str(x) for x in ('show', 'timeperiod')]
 __version__ = '0.1.0'
 
 

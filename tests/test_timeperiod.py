@@ -39,13 +39,13 @@ class TimePeriodTestSuite(unittest.TestCase):
             self.period.starttime = "Not a datetime.datetime object"
 
         self.assertEqual('starttime has to be a datetime object',
-                         context_manager.exception.message)
+                         str(context_manager.exception))
 
         with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
             self.period.endtime = "Not a datetime.datetime object"
 
         self.assertEqual('endtime has to be a datetime object',
-                         context_manager.exception.message)
+                         str(context_manager.exception))
 
 
     def test_date_must_be_tz_aware(self):
@@ -55,13 +55,13 @@ class TimePeriodTestSuite(unittest.TestCase):
             self.period.starttime = datetime.datetime(2017, 8, 30, 21, 0, 0, 0)
 
         self.assertEqual('starttime has to be a TZ aware datetime object',
-                         context_manager.exception.message)
+                         str(context_manager.exception))
 
         with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
             self.period.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0)
 
         self.assertEqual('endtime has to be a TZ aware datetime object',
-                         context_manager.exception.message)
+                         str(context_manager.exception))
 
 
     def test_start_date_utc_conversion(self):
@@ -95,7 +95,7 @@ class TimePeriodTestSuite(unittest.TestCase):
             self.period.endtime = end
 
         error = "endtime {0} has to be > than starttime {1}".format(end, start)
-        self.assertEqual(error, context_manager.exception.message)
+        self.assertEqual(error, str(context_manager.exception))
 
 
     def test_start_after_end_date(self):
@@ -111,7 +111,7 @@ class TimePeriodTestSuite(unittest.TestCase):
             self.period.starttime = start
 
         error = "starttime {0} has to be < than endtime {1}".format(start, end)
-        self.assertEqual(error, context_manager.exception.message)
+        self.assertEqual(error, str(context_manager.exception))
 
 
     def test_period_has_started(self):
@@ -193,7 +193,7 @@ class TimePeriodTestSuite(unittest.TestCase):
             self.period.duration = "Not a datetime.timedelta object"
 
         self.assertEqual('duration has to be a timedelta object',
-                         context_manager.exception.message)
+                         str(context_manager.exception))
 
 
     def test_duration_must_be_positive(self):
@@ -202,7 +202,7 @@ class TimePeriodTestSuite(unittest.TestCase):
             self.period.duration = datetime.timedelta(seconds=-1)
 
         self.assertEqual('duration must be positive',
-                         context_manager.exception.message)
+                         str(context_manager.exception))
 
 
     def test_duration_already_defined(self):
@@ -219,7 +219,7 @@ class TimePeriodTestSuite(unittest.TestCase):
             self.period.duration = datetime.timedelta(hours=2)
 
         self.assertEqual('duration already defined',
-                         context_manager.exception.message)
+                         str(context_manager.exception))
 
 
     def test_duration_sets_endtime(self):
