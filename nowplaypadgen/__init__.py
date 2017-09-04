@@ -1,4 +1,4 @@
-"""DAB+ now playing PAG (DLS+ and MOT SLS generator)"""
+"""DAB+ now playing PAD (DLS+ and MOT SLS generator)"""
 from __future__ import unicode_literals
 
 # Prevent "TypeError: Item in ``from list'' not a string" due to
