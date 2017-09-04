@@ -5,4 +5,4 @@ test:
 	python -m unittest discover -v
 
 api-doc:
-	sphinx-apidoc -M -o docs/api nowplaypadgen
+	sphinx-apidoc -M -f -o docs/api nowplaypadgen
