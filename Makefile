@@ -11,7 +11,7 @@ test: ## Run all tests.
 	python setup.py test
 
 .PHONY: api-doc
-api-doc:
+api-doc: ## Generate API docs using Sphinx.
 	sphinx-apidoc -M -o docs/api nowplaypadgen
 
 .PHONY: tox
