@@ -50,6 +50,9 @@ class Show(timeperiod.TimePeriod):
         self.uid = uid  # : The show's global unique identifier (UUID)
 
         self.description = None  # : The show's description
+
+        self.url = None # : The show's URL
+
         # Call the parent's constructor
         super(Show, self).__init__()
 
@@ -60,5 +63,5 @@ class Show(timeperiod.TimePeriod):
                  end time and URL
         :rtype: str
         """
-        return "Show '%s' (%s), start: '%s', end: '%s'" \
-                % (self.name, self.uid, self.starttime, self.endtime)
+        return "Show '%s' (%s), start: '%s', end: '%s', url: %s" \
+                % (self.name, self.uid, self.starttime, self.endtime, self.url)
