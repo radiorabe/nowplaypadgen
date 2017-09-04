@@ -10,6 +10,10 @@ init: ## Prepare local development environment.
 test: ## Run all tests.
 	python setup.py test
 
+.PHONY: api-doc
+api-doc:
+	sphinx-apidoc -M -o docs/api nowplaypadgen
+
 .PHONY: tox
 tox: install-tox ## Run tests in multiple venvs using tox.
 	tox
