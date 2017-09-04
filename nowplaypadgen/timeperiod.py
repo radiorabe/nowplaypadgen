@@ -117,7 +117,8 @@ class TimePeriod(object):
     def duration(self):
         """Getter for duration
 
-        Returns the duration of a period as a :class:datetime.timedelta object.
+        Returns the duration of a period as a :class:`datetime.timedelta`
+        object.
         Note, that the duration is stored in days, seconds and microseconds in
         such an object.
 
@@ -137,7 +138,7 @@ class TimePeriod(object):
 
         :param datetime.timedelta duration: The duration of the period
         :raises TimePeriodError: if duration is not a positive
-                                 :class:timedate.timedelta object or if start
+                                 :class:`timedate.timedelta` object or if start
                                  and endtime are already set (as this might
                                  change the period).
         """
@@ -165,7 +166,7 @@ class TimePeriod(object):
         """Sets the length of a period in seconds
 
         Sets the period's length in seconds, this is a helper wrapper around
-        :method:TimePeriod.duration().
+        :meth:`TimePeriod.duration()`.
 
         :param float seconds: The length or duration of the period in seconds
         """
