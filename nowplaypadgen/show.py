@@ -11,38 +11,49 @@ class ShowError(Exception):
 
 
 class Show(timeperiod.TimePeriod):
-    """Show class which represents a specific broadcast show
+    """Show class which represents a specific broadcast show.
 
-       A show has a name, a unique identifier, an optional description and URL,
-       as well as an absolute start and end date/time. A show can be active,
-       started or ended.
+    A show has a name, a unique identifier, an optional description and URL,
+    as well as an absolute start and end date/time. A show can be active,
+    started or ended.
 
-       Example::
+    The show constructor expects a single string with the name of the show.
 
-           sh = Show('My Show')
+    >>> sh = Show('My Show')
 
-           # Optional show parameters
-           sh.description = "My weekly show about Python coding"
-           sh.url = 'http://pyshow.example.com
+    You can set optional attributes on shows.
 
-           import datetime
-           import pytz
+    >>> sh.description = "My weekly show about Python coding"
+    >>> sh.url = 'http://pyshow.example.com'
 
-           sh.starttime = datetime.datetime(2017,8,30,21,00,00,00,pytz.utc)
-           sh.endtime = datetime.datetime(2017,8,30,22,00,00,00,pytz.utc)
+    In this example we set our hour long show to have finished an hour ago.
 
-           if sh.active():
-               "I'm on-air right now!"
+    >>> import pytz
+    >>> from datetime import datetime, timedelta
+    >>>
+    >>> sh.starttime = datetime.now(tz=pytz.utc) - timedelta(hours=2)
+    >>> sh.endtime = datetime.now(tz=pytz.utc) - timedelta(hours=1)
+    >>>
+    >>> sh.active()
+    False
+
+    Now we change the end time so that the show ends in an hour.
+
+    >>> sh.endtime = datetime.now(tz=pytz.utc) + timedelta(hours=1)
+    >>>
+    >>> sh.active()
+    True
     """
 
     # pylint: disable=too-many-instance-attributes
     # More than eight are reasonable since this is the main model
 
     def __init__(self, name=None, uid=uuid.uuid4()):
+        # type: (str, uuid.UUID) -> None
         """Constructor for the show
 
-        :param str: The name of the show
-        :param str: The UUID of the show
+        :param str name: The name of the show.
+        :param uuid.UUID uid: The UUID of the show.
         """
 
         self.name = name  # : The show's name
@@ -57,10 +68,10 @@ class Show(timeperiod.TimePeriod):
         super(Show, self).__init__()
 
     def __str__(self):
-        """Returns a string representation of the show, useful for logging
+        """Return a string representation of the show, useful for logging.
 
         :return: String containing the show's name, start time,
-                 end time and URL
+                 end time and URL.
         :rtype: str
         """
         return "Show '%s' (%s), start: '%s', end: '%s', url: %s" \
