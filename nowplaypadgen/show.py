@@ -45,9 +45,6 @@ class Show(timeperiod.TimePeriod):
     True
     """
 
-    # pylint: disable=too-many-instance-attributes
-    # More than eight are reasonable since this is the main model
-
     def __init__(self, name=None, uid=uuid.uuid4()):
         # type: (str, uuid.UUID) -> None
         """Constructor for the show
@@ -74,5 +71,12 @@ class Show(timeperiod.TimePeriod):
                  end time and URL.
         :rtype: str
         """
-        return "Show '%s' (%s), start: '%s', end: '%s', url: %s" \
-                % (self.name, self.uid, self.starttime, self.endtime, self.url)
+        return ("Show '%(name)' (%(uid)), "
+                "start: '%(startime)', "
+                "end: '%(endtime)', "
+                "url: '%(url)'"
+               ).format(name=self.name,
+                        uid=self.uid,
+                        starttime=self.starttime,
+                        endtime=self.endtime,
+                        url=self.url)
