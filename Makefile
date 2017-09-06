@@ -12,7 +12,7 @@ test: ## Run all tests.
 
 .PHONY: api-doc
 api-doc: ## Generate API docs using Sphinx.
-	sphinx-apidoc -M -o docs/api nowplaypadgen
+	sphinx-apidoc -M -f -o docs/api nowplaypadgen
 
 .PHONY: tox
 tox: install-tox ## Run tests in multiple venvs using tox.
