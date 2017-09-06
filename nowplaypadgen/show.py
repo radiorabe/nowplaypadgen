@@ -53,13 +53,13 @@ class Show(timeperiod.TimePeriod):
         :param uuid.UUID uid: The UUID of the show.
         """
 
-        self.name = name  # : The show's name
+        self.name = name  #: The show's name
 
-        self.uid = uid  # : The show's global unique identifier (UUID)
+        self.uid = uid  #: The show's global unique identifier (UUID)
 
-        self.description = None  # : The show's description
+        self.description = None  #: The show's description
 
-        self.url = None # : The show's URL
+        self.url = None  #: The show's URL
 
         # Call the parent's constructor
         super(Show, self).__init__()
