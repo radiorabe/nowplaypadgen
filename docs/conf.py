@@ -177,3 +177,7 @@ texinfo_documents = [
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
+# List of autodoc directive flags that should be automatically applied to all
+# autodoc directives
+autodoc_default_flags = [ 'special-members', 'show-inheritance' ]
