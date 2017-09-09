@@ -47,6 +47,10 @@ Example ASCII art representation::
 import datetime
 import pytz
 
+# @TODO: - Add support for dummy objects
+#        - Add support for delete objects
+#        - Add support for item toggle and running bit
+#        - Add an DL Plus object container
 
 #: Content type categories according to chapter 5.1 of ETSI TS 102 980
 CATEGORIES = ['Dummy', 'Item', 'Info', 'Programme',
