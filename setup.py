@@ -4,8 +4,6 @@ import os
 import re
 import sys
 
-import nowplaypadgen
-
 from setuptools import setup, find_packages
 
 
@@ -51,7 +49,8 @@ ENTRY_POINTS = {
 setup(
     name='nowplaypadgen',
     version=get_version(),
-    description=nowplaypadgen.__doc__,
+    description=('DAB+ now playing PAD ',
+                 '(DLS+ and MOT SLS generator)'),
     long_description=readme(),
     url='https://github.com/radiorabe/nowplaypadgen',
     author='Christian Affolter',
