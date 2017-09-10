@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
 """dlplus module related unit tests"""
+
+from __future__ import unicode_literals
 
 import datetime
 import os
@@ -68,6 +71,50 @@ class DLPlusObjectTestSuite(unittest.TestCase):
         for content_type, code in content_types_to_codes:
             dlp_object = dlplus.DLPlusObject(content_type, self.text)
             self.assertEqual(dlp_object.get_code(), code)
+
+
+    def test_invalid_content_type(self):
+        """Test that an invalid content type will be refused"""
+
+        content_type = 'MY.INVALID.TYPE'
+
+        with self.assertRaises(
+            dlplus.DLPlusContentTypeError) as context_manager:
+            dlp_object = dlplus.DLPlusObject(content_type, self.text)
+
+        self.assertEqual('Invalid content_type: {}'.format(content_type),
+                         str(context_manager.exception))
+
+
+    def test_maximum_text_limit(self):
+        """Test that a DL Plus Object's text can't be longer than 128 bytes"""
+
+        # Up to a 128 bytes long DL Plus Object text must be supported
+        max_length = 128
+
+        # Generate a 128 character long unicode string, which will be encoded
+        # to utf-8 within the DLPlusObject. A character out of the first 128
+        # utf-8 code points is used, so that it will require exactly one byte
+        # per character (128 characters => 128 bytes).
+        text = 'a' * max_length
+        self.assertEqual(len(text.encode('utf-8')), max_length)
+
+        dlp_object = dlplus.DLPlusObject(self.content_type, text)
+        self.assertTrue(isinstance(dlp_object, dlplus.DLPlusObject))
+        self.assertEqual(len(dlp_object.text.encode('utf-8')), max_length)
+
+
+        # This text exceeds the limit by one byte and should fail
+        text = 'a' * (max_length + 1)
+        self.assertEqual(len(text.encode('utf-8')), max_length + 1)
+
+        with self.assertRaises(dlplus.DLPlusObjectError) as context_manager:
+            dlp_object = dlplus.DLPlusObject(self.content_type, text)
+
+        self.assertEqual('Text is longer than {} bytes'.format(max_length),
+                         str(context_manager.exception))
+
+
 
 
 if __name__ == '__main__':
