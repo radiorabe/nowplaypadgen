@@ -1,14 +1,9 @@
 """Show related unit tests"""
 
-import os
-import sys
 import unittest
 
-# Load the module locally from the dev environment.
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from nowplaypadgen import show # pylint: disable=wrong-import-position
-from nowplaypadgen import timeperiod # pylint: disable=wrong-import-position
-
+from nowplaypadgen import show
+from nowplaypadgen import timeperiod
 
 class ShowTestSuite(unittest.TestCase):
     """Show test cases."""
