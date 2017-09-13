@@ -78,9 +78,8 @@ class DLPlusObjectTestSuite(unittest.TestCase):
 
         content_type = 'MY.INVALID.TYPE'
 
-        with self.assertRaises(
-            dlplus.DLPlusContentTypeError) as context_manager:
-            dlp_object = dlplus.DLPlusObject(content_type, self.text)
+        with self.assertRaises(dlplus.DLPlusContentTypeError) as context_manager:
+            _ = dlplus.DLPlusObject(content_type, self.text)
 
         self.assertEqual('Invalid content_type: {}'.format(content_type),
                          str(context_manager.exception))
@@ -109,12 +108,69 @@ class DLPlusObjectTestSuite(unittest.TestCase):
         self.assertEqual(len(text.encode('utf-8')), max_length + 1)
 
         with self.assertRaises(dlplus.DLPlusObjectError) as context_manager:
-            dlp_object = dlplus.DLPlusObject(self.content_type, text)
+            _ = dlplus.DLPlusObject(self.content_type, text)
 
         self.assertEqual('Text is longer than {} bytes'.format(max_length),
                          str(context_manager.exception))
 
 
+
+
+class DLPlusTagTestSuite(unittest.TestCase):
+    """DLPlusTag test cases."""
+
+    def setUp(self):
+        self.content_type = 'ITEM.TITLE'
+        self.start = 5
+        self.length = 10
+
+
+    def test_instance_creation(self):
+        """Test the creation of a new DL Plus Tag"""
+
+        dlp_tag = dlplus.DLPlusTag(self.content_type, self.start, self.length)
+
+        self.assertTrue(isinstance(dlp_tag, dlplus.DLPlusTag))
+        self.assertEqual(dlp_tag.content_type, self.content_type)
+        self.assertEqual(dlp_tag.start, self.start)
+        self.assertEqual(dlp_tag.length, self.length)
+
+
+    def test_invalid_start(self):
+        """Test that a DL Plus Tag start marker must be a postive integer"""
+
+        expected_error_msg = 'start must be a positive integer'
+
+        # No integer was passed
+        with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
+            _ = dlplus.DLPlusTag(
+                self.content_type, 'not-an-integer', self.length)
+
+        self.assertEqual(expected_error_msg, str(context_manager.exception))
+
+        # A negative integer was passed
+        with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
+            _ = dlplus.DLPlusTag(self.content_type, -123, self.length)
+
+        self.assertEqual(expected_error_msg, str(context_manager.exception))
+
+
+    def test_invalid_length(self):
+        """Test that a DL Plus Tag length marker must be a postive integer"""
+
+        expected_error_msg = 'length must be a positive integer'
+
+        # No integer was passed
+        with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
+            _ = dlplus.DLPlusTag(self.content_type, self.start, 'not-an-integer')
+
+        self.assertEqual(expected_error_msg, str(context_manager.exception))
+
+        # A negative integer was passed
+        with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
+            _ = dlplus.DLPlusTag(self.content_type, self.start, -123)
+
+        self.assertEqual(expected_error_msg, str(context_manager.exception))
 
 
 if __name__ == '__main__':
