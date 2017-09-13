@@ -658,6 +658,7 @@ class DLPlusObject(object):
 
         # Make sure that the byte length of the text doesn't exceed the maximum
         # allowed limit.
+        # https://stackoverflow.com/a/4013418/8587602
         if len(text.encode('utf-8')) > MAXIMUM_TEXT_LIMIT:
             raise DLPlusObjectError(
                 'Text is longer than {} bytes'.format(MAXIMUM_TEXT_LIMIT))
@@ -740,10 +741,10 @@ class DLPlusTag(object):
             raise DLPlusContentTypeError(
                 'Invalid content_type: {}'.format(content_type))
 
-        if start < 0:
+        if not isinstance(start, int) or start < 0:
             raise DLPlusTagError('start must be a positive integer')
 
-        if length < 0:
+        if not isinstance(length, int) or length < 0:
             raise DLPlusTagError('length must be a positive integer')
 
         self.content_type = content_type
