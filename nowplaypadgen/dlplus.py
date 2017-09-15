@@ -626,17 +626,14 @@ class DLPlusMessage(object):
         return self._message
 
 
-class DLPlusObject(object):
-    """Dynamic Label Plus (DL Plus) object
+class DLPlusContentType(object):
+    """Dynamic Label Plus content type"""
 
-    DL Plus object which holds a text string with a defined content type.
-    """
+    def __init__(self, content_type):
+        """Constructor
 
-    def __init__(self, content_type, text=''):
-        """Constructor for a DL Plus Object
-
-        Creates a new :class:`DLPlusObject` object with a specific content type
-        (`content_type`) and the corresponding text string (`text`).
+        Creates a new :class:`DLPlusContentType` object with a specific content
+        type (`content_type`)
 
         For a list of supported content types see either :attr:`CONTENT_TYPES`
         or refer to `ETSI TS 102 980
@@ -646,31 +643,15 @@ class DLPlusObject(object):
         :param str content_type: The content type according to ETSI TS 102 980,
                                  Annex A (List of DL Plus content types), Table
                                  A.1
-        :param str text: The DL Plus object text string
         :raises DLPlusContentTypeError: if an invalid content type was specified
-        :raises DLPlusMessageError: if the text exceeds the maximum allowed size
-                                    in bytes (:attr:`MAXIMUM_TEXT_LIMIT`).
         """
 
         if content_type not in CONTENT_TYPES:
             raise DLPlusContentTypeError(
                 'Invalid content_type: {}'.format(content_type))
 
-        # Make sure that the byte length of the text doesn't exceed the maximum
-        # allowed limit.
-        # https://stackoverflow.com/a/4013418/8587602
-        if len(text.encode('utf-8')) > MAXIMUM_TEXT_LIMIT:
-            raise DLPlusObjectError(
-                'Text is longer than {} bytes'.format(MAXIMUM_TEXT_LIMIT))
-
         #: The content type according to ETSI TS 102 980, Annex A, Table A.1
         self.content_type = content_type
-
-        #: The text string of the DL Plus object
-        self.text = text
-
-        #: The creation time stamp of the DL Plus object in UTC
-        self.creation_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
 
     def get_code(self):
@@ -699,6 +680,60 @@ class DLPlusObject(object):
 
 
     def __str__(self):
+        """Returns the content type
+
+        :return: DL Plus content type
+        :rtype: str
+        """
+        return self.content_type
+
+
+class DLPlusObject(DLPlusContentType):
+    """Dynamic Label Plus (DL Plus) object
+
+    DL Plus object which holds a text string with a defined content type.
+    """
+
+    def __init__(self, content_type, text=''):
+        """Constructor for a DL Plus Object
+
+        Creates a new :class:`DLPlusObject` object with a specific content type
+        (`content_type`) and the corresponding text string (`text`).
+
+        For a list of supported content types see either :attr:`CONTENT_TYPES`
+        or refer to `ETSI TS 102 980
+        <http://www.etsi.org/deliver/etsi_ts/102900_102999/102980/02.01.01_60/ts_102980v020101p.pdf>`_,
+        `Annex A (List of DL Plus content types), Table A.1`.
+
+        :param str content_type: The content type according to ETSI TS 102 980,
+                                 Annex A (List of DL Plus content types), Table
+                                 A.1
+        :param str text: The DL Plus object text string
+        :raises DLPlusContentTypeError: if an invalid content type was specified
+        :raises DLPlusMessageError: if the text exceeds the maximum allowed size
+                                    in bytes (:attr:`MAXIMUM_TEXT_LIMIT`).
+        """
+
+        # Call the parent constructor which will asign self.content_type
+        super(DLPlusObject, self).__init__(content_type)
+
+
+        # Make sure that the byte length of the text doesn't exceed the maximum
+        # allowed limit.
+        # https://stackoverflow.com/a/4013418/8587602
+        if len(text.encode('utf-8')) > MAXIMUM_TEXT_LIMIT:
+            raise DLPlusObjectError(
+                'Text is longer than {} bytes'.format(MAXIMUM_TEXT_LIMIT))
+
+        #: The text string of the DL Plus object
+        self.text = text
+
+        #: The creation time stamp of the DL Plus object in UTC
+        self.creation_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+
+
+    def __str__(self):
         """Returns the DL Plus object's text
 
         :return: DL Plus object text
@@ -707,7 +742,7 @@ class DLPlusObject(object):
         return self.text
 
 
-class DLPlusTag(object):
+class DLPlusTag(DLPlusContentType):
     """Dynamic Label Plus (DL Plus) tag
 
     DL plus tag which defines a start and length marker together with a content
@@ -737,9 +772,8 @@ class DLPlusTag(object):
                                 integer.
         """
 
-        if content_type not in CONTENT_TYPES:
-            raise DLPlusContentTypeError(
-                'Invalid content_type: {}'.format(content_type))
+        # Call the parent constructor which will asign self.content_type
+        super(DLPlusTag, self).__init__(content_type)
 
         if not isinstance(start, int) or start < 0:
             raise DLPlusTagError('start must be a positive integer')
@@ -750,18 +784,6 @@ class DLPlusTag(object):
         self.content_type = content_type
         self.start = start
         self.length = length
-
-
-    def get_category(self):
-        """Get the content type category
-
-        Returns the content type category according to ETSI TS 102 980, Annex A
-        (List of DL Plus content types), Table A.1.
-
-        :return: category string
-        :rtype: str
-        """
-        return CONTENT_TYPES[self.content_type]['category']
 
 
     @classmethod
