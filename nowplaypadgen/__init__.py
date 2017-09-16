@@ -1,5 +1,6 @@
 """DAB+ now playing PAD (DLS+ and MOT SLS generator)"""
 from __future__ import unicode_literals
+from future.utils import python_2_unicode_compatible
 
 # Prevent "TypeError: Item in ``from list'' not a string" due to
 # unicode_literals

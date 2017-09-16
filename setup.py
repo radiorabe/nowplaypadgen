@@ -30,6 +30,7 @@ def pytest_runner():
     return ['pytest-runner~=2.11.1'] if needs_pytest else []
 
 INSTALL_REQUIRES = [
+    'future',
     'pytz>=2017.02',
     'setuptools~=28.8.0',
     'markdown',

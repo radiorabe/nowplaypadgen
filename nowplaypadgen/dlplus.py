@@ -46,6 +46,7 @@ Example ASCII art representation::
 
 import datetime
 import pytz
+from future.utils import python_2_unicode_compatible
 
 # @TODO: - Add support for dummy objects
 #        - Add support for delete objects
@@ -433,7 +434,6 @@ class DLPlusObjectError(DLPlusError):
     """DL Plus object related exceptions"""
 
 
-
 class DLPlusMessage(object):
     """Dynamic Label Plus (DL Plus) message
 
@@ -441,7 +441,11 @@ class DLPlusMessage(object):
     """
 
     def __init__(self):
-        """Constructor for the DLPlusMessage"""
+        """Constructor for the DLPlusMessage
+
+	Creates a new :class:`DLPlusMessage` object which can be used to parse
+	or build a DL Plus message string.
+	"""
 
         #: The format string from which the message will be built
         self.format_string = ''
@@ -480,13 +484,14 @@ class DLPlusMessage(object):
         """
 
         if not isinstance(dlp_object, DLPlusObject):
-            raise DLPlusMessageError("dlp_object has to be a DLPlusObject")
+            raise DLPlusMessageError(
+                "dlp_object has to be a DLPlusObject object")
 
         # Up to four DL Plus objects can be created from each DL message
         # according to ETSI TS 102 980, 5.1
-        if len(self._dlp_objects) > 4:
+        if len(self._dlp_objects) >= 4:
             raise DLPlusMessageError(
-                "Only a maximum of 4 DLPlusObjects can be added")
+                "Only a maximum of 4 DLPlusObject objects can be added")
 
         # Use the content_type of the DL Plus object as the dictionary key
         self._dlp_objects[dlp_object.content_type] = dlp_object
@@ -495,8 +500,8 @@ class DLPlusMessage(object):
     def get_dlp_objects(self):
         """Returns the associated DL Plus objects (:class:`DLPlusObject`)
 
-        :return: List of :class:`DLPlusObject` objects.
-        :rtype: list
+        :return: Dictionary of :class:`DLPlusObject` objects.
+        :rtype: dict
         """
         return self._dlp_objects
 
@@ -522,9 +527,9 @@ class DLPlusMessage(object):
 
         # Up to four DL Plus tags can be created from each DL message
         # according to ETSI TS 102 980, 5.1
-        if len(self._dlp_tags) > 4:
+        if len(self._dlp_tags) >= 4:
             raise DLPlusMessageError(
-                "Only a maximum of 4 DLPlusTags can be added")
+                "Only a maximum of 4 DLPlusTag objects can be added")
 
         self._dlp_tags[dlp_tag.content_type] = dlp_tag
 
@@ -532,8 +537,8 @@ class DLPlusMessage(object):
     def get_dlp_tags(self):
         """Returns the associated DL Plus tags (:class:`DLPlusTag`)
 
-        :return: List of :class:`DLPlusTag` objects.
-        :rtype: list
+        :return: Dictionary of :class:`DLPlusTag` objects.
+        :rtype: dict
         """
         return self._dlp_tags
 
@@ -557,11 +562,14 @@ class DLPlusMessage(object):
         # Reset the DLPlusObjects
         self._dlp_objects = {}
 
-        # Extract sub strings from the message according to the DLPlusTags
-        # to create DLPLusObjects
-        for dlp_tag in self._dlp_tags:
+        # Extract sub strings from the message according to the DLPlusTag
+        # objects to create DLPLusObject objects
+        for content_type in self._dlp_tags:
+            dlp_tag = self._dlp_tags[content_type]
+            end = dlp_tag.start + dlp_tag.length
+
             self._dlp_objects[dlp_tag.content_type] = DLPlusObject(
-                dlp_tag.content_type, message[dlp_tag.start:dlp_tag.length])
+                dlp_tag.content_type, message[dlp_tag.start:end])
 
         self._message = message
         self._parsed = True
@@ -573,16 +581,17 @@ class DLPlusMessage(object):
         This method builds a DL Plus message string from a given
         `format_string` and up to four DL Plus objects (:class:`DLPlusObject`).
         The DL Plus object's text will replace any corresponding content type
-        pattern (``{CONTENT.TYPE}``) within the `format_string` (with the help
-        of :meth:`str.format()`). Apart from that, the required DL Plus tags
-        (:class:`DLPlusTag`) will be created, with the correct `start` and
+        pattern (``{o[CONTENT.TYPE]}``) within the `format_string` (with the
+        help of :meth:`str.format()`). Apart from that, the required DL Plus
+        tags (:class:`DLPlusTag`) will be created, with the correct `start` and
         `length` markers.
 
-        For example, the following `format_string` ``Now playing: {ITEM.ARTIST}
-        - {ITEM.TITLE}`` will be built into ``Now playing: My Artist - My
-        Title``, given that two DL Plus objects (:class:`DLPlusObjects`) with
-        the corresponding content types are available. Furthermore, two related
-        DL Plus tags (:class:`DLPlusTag`) will be created.
+        For example, the following `format_string`
+        ``Now playing: {o[ITEM.ARTIST]} - {o[ITEM.TITLE]}`` will be built into
+        ``Now playing: My Artist - My Title``, given that two DL Plus objects
+        (:class:`DLPlusObjects`) with the corresponding content types are
+        available. Furthermore, two related DL Plus tags (:class:`DLPlusTag`)
+        will be created.
 
         Before calling this method, one is supposed to add up to four DL Plus
         objects (:class:`DLPlusObject`) via the
@@ -592,14 +601,18 @@ class DLPlusMessage(object):
 
         :param str format_string: The DL Plus message string format with content
                                   type replacement patterns in curly braces
-                                  (such as ``{CONTENT.TYPE}``).
+                                  (such as ``{o[CONTENT.TYPE]}``).
         :raises DLPlusMessageError: if the message exceeds the maximum allowed
                                     size in bytes (:attr:`MAXIMUM_TEXT_LIMIT`).
         """
         self.format_string = format_string
 
         # Create the message according to the available DLPlusObjects
-        message = self.format_string.format(self._dlp_objects)
+        # Note, that we have to use a parameter assignment
+        # (o=self._dlp_objects) here, rather than directly unpack the
+        # dictionary (via .format(**self._dlp_objects)). As dots in
+        # keys for str.format() are not allowed and will result in KeyError
+        message = self.format_string.format(o=self._dlp_objects)
 
         # Make sure that the byte length of the message doesn't exceed the
         # maximum allowed limit.
@@ -613,17 +626,32 @@ class DLPlusMessage(object):
         self._dlp_tags = {}
 
         # Create DLPlusTags from the message and DLPlusObjects
-        for dlp_object in self._dlp_objects:
+        for content_type in self._dlp_objects:
+            dlp_object = self._dlp_objects[content_type]
             self._dlp_tags[dlp_object.content_type] = DLPlusTag.from_message(
                 self, dlp_object.content_type)
 
         self._built = True
 
 
-    def __str__(self):
-        # utf8len
-        #len(s.encode('utf-8'))
+    @property
+    def message(self):
+        """Getter for :attr:`_message`
+
+        :return: Formatted DL Plus Message
+        :rtype: str
+        """
         return self._message
+
+
+    def __str__(self):
+        """Returns the formatted DL Plus Message
+
+        :return: Formatted DL Plus Message
+        :rtype: str
+        """
+
+        return self.message
 
 
 class DLPlusContentType(object):
@@ -678,7 +706,6 @@ class DLPlusContentType(object):
         """
         return CONTENT_TYPES[self.content_type]['category']
 
-
     def __str__(self):
         """Returns the content type
 
@@ -688,6 +715,7 @@ class DLPlusContentType(object):
         return self.content_type
 
 
+@python_2_unicode_compatible
 class DLPlusObject(DLPlusContentType):
     """Dynamic Label Plus (DL Plus) object
 
@@ -717,7 +745,6 @@ class DLPlusObject(DLPlusContentType):
         # Call the parent constructor which will asign self.content_type
         super(DLPlusObject, self).__init__(content_type)
 
-
         # Make sure that the byte length of the text doesn't exceed the maximum
         # allowed limit.
         # https://stackoverflow.com/a/4013418/8587602
@@ -742,6 +769,7 @@ class DLPlusObject(DLPlusContentType):
         return self.text
 
 
+@python_2_unicode_compatible
 class DLPlusTag(DLPlusContentType):
     """Dynamic Label Plus (DL Plus) tag
 
@@ -818,9 +846,9 @@ class DLPlusTag(DLPlusContentType):
                     content_type))
 
         # Get the start marker (index) of the DL Plus object's text
-        start = dlp_message.find(dlp_object)
+        start = dlp_message.message.find(dlp_object.text)
 
         # Get the string length of the DL Plus object's text
-        length = len(dlp_object)
+        length = len(dlp_object.text)
 
         return cls(content_type, start, length)

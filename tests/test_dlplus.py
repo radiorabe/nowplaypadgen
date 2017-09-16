@@ -59,7 +59,8 @@ class DLPlusContentTypeTestSuite(unittest.TestCase):
 
         content_type = 'MY.INVALID.TYPE'
 
-        with self.assertRaises(dlplus.DLPlusContentTypeError) as context_manager:
+        with self.assertRaises(
+            dlplus.DLPlusContentTypeError) as context_manager:
             _ = dlplus.DLPlusContentType(content_type)
 
         self.assertEqual('Invalid content_type: {}'.format(content_type),
@@ -148,38 +149,225 @@ class DLPlusTagTestSuite(unittest.TestCase):
     def test_invalid_start(self):
         """Test that a DL Plus Tag start marker must be a postive integer"""
 
-        expected_error_msg = 'start must be a positive integer'
+        expected_msg = 'start must be a positive integer'
 
         # No integer was passed
         with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
             _ = dlplus.DLPlusTag(
                 self.content_type, 'not-an-integer', self.length)
 
-        self.assertEqual(expected_error_msg, str(context_manager.exception))
+        self.assertEqual(expected_msg, str(context_manager.exception))
 
         # A negative integer was passed
         with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
             _ = dlplus.DLPlusTag(self.content_type, -123, self.length)
 
-        self.assertEqual(expected_error_msg, str(context_manager.exception))
+        self.assertEqual(expected_msg, str(context_manager.exception))
 
 
     def test_invalid_length(self):
         """Test that a DL Plus Tag length marker must be a postive integer"""
 
-        expected_error_msg = 'length must be a positive integer'
+        expected_msg = 'length must be a positive integer'
 
         # No integer was passed
         with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
             _ = dlplus.DLPlusTag(self.content_type, self.start, 'not-an-integer')
 
-        self.assertEqual(expected_error_msg, str(context_manager.exception))
+        self.assertEqual(expected_msg, str(context_manager.exception))
 
         # A negative integer was passed
         with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
             _ = dlplus.DLPlusTag(self.content_type, self.start, -123)
 
-        self.assertEqual(expected_error_msg, str(context_manager.exception))
+        self.assertEqual(expected_msg, str(context_manager.exception))
+
+
+class DLPlusMessageTestSuite(unittest.TestCase):
+    """DLPlusMessage test cases."""
+
+    # pylint: disable=too-many-instance-attributes
+    # It's convenient to have all those public attributes here, rather
+    # than re-defining them on each test-case.
+    def setUp(self):
+
+        self.title = 'My Titleö'
+        self.artist = 'My Artistä'
+
+        prefix = 'Now playing: '
+        self.format_string = prefix + '{o[ITEM.TITLE]} - {o[ITEM.ARTIST]}'
+
+        self.title_start = len(prefix)
+        self.title_length = len(self.title)
+
+        self.artist_start = self.title_start + self.title_length + 3
+        self.artist_length = len(self.artist)
+
+        mapping = {'ITEM.TITLE': self.title, 'ITEM.ARTIST': self.artist}
+        self.message_string = self.format_string.format(o=mapping)
+
+        self.title_content_type = 'ITEM.TITLE'
+        self.artist_content_type = 'ITEM.ARTIST'
+
+        self.dlp_title_obj = dlplus.DLPlusObject(
+            self.title_content_type, self.title)
+
+        self.dlp_artist_obj = dlplus.DLPlusObject(
+            self.artist_content_type, self.artist)
+
+        self.dlp_artist_tag = dlplus.DLPlusTag(
+            self.artist_content_type, self.artist_start, self.artist_length)
+
+        self.dlp_title_tag = dlplus.DLPlusTag(
+            self.title_content_type, self.title_start, self.title_length)
+
+        self.dlp_msg = dlplus.DLPlusMessage()
+
+
+
+    def test_instance_creation(self):
+        """Test the creation of a new DL Plus Message"""
+
+        self.assertTrue(isinstance(self.dlp_msg, dlplus.DLPlusMessage))
+
+
+    def test_add_dlp_object(self):
+        """Test that DL Plus Objects can be added and retrieved"""
+
+        self.dlp_msg.add_dlp_object(self.dlp_title_obj)
+        self.dlp_msg.add_dlp_object(self.dlp_artist_obj)
+
+        dlp_objects = self.dlp_msg.get_dlp_objects()
+        self.assertTrue(isinstance(dlp_objects, dict))
+
+        self.assertTrue('ITEM.TITLE' in dlp_objects)
+        self.assertEqual(dlp_objects['ITEM.TITLE'], self.dlp_title_obj)
+
+        self.assertTrue('ITEM.ARTIST' in dlp_objects)
+        self.assertEqual(dlp_objects['ITEM.ARTIST'], self.dlp_artist_obj)
+
+
+    def test_add_invalid_dlp_object(self):
+        """Test that only DLPlusObject objects can be added"""
+
+        with self.assertRaises(dlplus.DLPlusMessageError) as context_manager:
+            self.dlp_msg.add_dlp_object('not-a-DLPlusObject')
+
+        expected_msg = 'dlp_object has to be a DLPlusObject object'
+        self.assertEqual(expected_msg, str(context_manager.exception))
+
+
+    def test_maximum_dlp_objects(self):
+        """Test that no more than 4 DLPlusObject objects can be added"""
+
+        dlp_objects_list = [
+            dlplus.DLPlusObject('ITEM.TITLE', 'title'),
+            dlplus.DLPlusObject('ITEM.ALBUM', 'album'),
+            dlplus.DLPlusObject('ITEM.TRACKNUMBER', '1'),
+            dlplus.DLPlusObject('ITEM.ARTIST', 'artist'),
+            dlplus.DLPlusObject('ITEM.COMPOSITION', 'composition')
+        ]
+
+        with self.assertRaises(dlplus.DLPlusMessageError) as context_manager:
+            for dlp_object in dlp_objects_list:
+                self.dlp_msg.add_dlp_object(dlp_object)
+
+        expected_msg = 'Only a maximum of 4 DLPlusObject objects can be added'
+        self.assertEqual(expected_msg, str(context_manager.exception))
+
+
+    def test_add_dlp_tag(self):
+        """Test that DL Plus tags can be added and retrieved"""
+
+        self.dlp_msg.add_dlp_tag(self.dlp_title_tag)
+        self.dlp_msg.add_dlp_tag(self.dlp_artist_tag)
+
+        dlp_tags = self.dlp_msg.get_dlp_tags()
+        self.assertTrue(isinstance(dlp_tags, dict))
+
+        self.assertTrue('ITEM.TITLE' in dlp_tags)
+        self.assertEqual(dlp_tags['ITEM.TITLE'], self.dlp_title_tag)
+
+        self.assertTrue('ITEM.ARTIST' in dlp_tags)
+        self.assertEqual(dlp_tags['ITEM.ARTIST'], self.dlp_artist_tag)
+
+
+    def test_add_invalid_dlp_tag(self):
+        """Test that only DLPlusTag objects can be added"""
+
+        with self.assertRaises(dlplus.DLPlusMessageError) as context_manager:
+            self.dlp_msg.add_dlp_tag('not-a-DLPlusTag')
+
+        expected_msg = 'dlp_tag has to be a DLPlusTag object'
+        self.assertEqual(expected_msg, str(context_manager.exception))
+
+
+    def test_maximum_dlp_tags(self):
+        """Test that no more than 4 DLPlusTag objects can be added"""
+
+        dlp_tags_list = [
+            dlplus.DLPlusTag('ITEM.TITLE', 1, 10),
+            dlplus.DLPlusTag('ITEM.ALBUM', 12, 10),
+            dlplus.DLPlusTag('ITEM.TRACKNUMBER', 24, 10),
+            dlplus.DLPlusTag('ITEM.ARTIST', 36, 10),
+            dlplus.DLPlusTag('ITEM.COMPOSITION', 48, 10)
+        ]
+
+        with self.assertRaises(dlplus.DLPlusMessageError) as context_manager:
+            for dlp_tag in dlp_tags_list:
+                self.dlp_msg.add_dlp_tag(dlp_tag)
+
+        expected_msg = 'Only a maximum of 4 DLPlusTag objects can be added'
+        self.assertEqual(expected_msg, str(context_manager.exception))
+
+
+    def test_parse_message(self):
+        """Test the parsing of a DL Plus message"""
+
+        self.dlp_msg.add_dlp_tag(self.dlp_title_tag)
+        self.dlp_msg.add_dlp_tag(self.dlp_artist_tag)
+
+        self.dlp_msg.parse(self.message_string)
+
+        dlp_objects = self.dlp_msg.get_dlp_objects()
+
+        # A dictionary with two DLPlusObject objects is expected.
+        self.assertTrue(isinstance(dlp_objects, dict))
+        self.assertEqual(len(dlp_objects), 2)
+
+        self.assertTrue('ITEM.TITLE' in dlp_objects)
+        self.assertEqual(dlp_objects['ITEM.TITLE'].text, self.title)
+
+        self.assertTrue('ITEM.ARTIST' in dlp_objects)
+        self.assertEqual(dlp_objects['ITEM.ARTIST'].text, self.artist)
+
+
+    def test_build_message(self):
+        """Test the building of a DL Plus message"""
+
+        self.dlp_msg.add_dlp_object(self.dlp_title_obj)
+        self.dlp_msg.add_dlp_object(self.dlp_artist_obj)
+
+        self.dlp_msg.build(self.format_string)
+
+        dlp_tags = self.dlp_msg.get_dlp_tags()
+
+        # Check that the message was correctly built
+        self.assertEqual(self.dlp_msg.message, self.message_string)
+
+        # A dictionary with two DLPlusTag objects is expected.
+        self.assertTrue(isinstance(dlp_tags, dict))
+        self.assertEqual(len(dlp_tags), 2)
+
+        # Test that the start and length markers are correct
+        self.assertTrue('ITEM.ARTIST' in dlp_tags)
+        self.assertEqual(dlp_tags['ITEM.ARTIST'].start, self.artist_start)
+        self.assertEqual(dlp_tags['ITEM.ARTIST'].length, self.artist_length)
+
+        # Test that the start and length markers are correct
+        self.assertTrue('ITEM.TITLE' in dlp_tags)
+        self.assertEqual(dlp_tags['ITEM.TITLE'].start, self.title_start)
+        self.assertEqual(dlp_tags['ITEM.TITLE'].length, self.title_length)
 
 
 if __name__ == '__main__':
