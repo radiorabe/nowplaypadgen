@@ -32,7 +32,7 @@ def pytest_runner():
 INSTALL_REQUIRES = [
     'future',
     'pytz>=2017.02',
-    'setuptools~=28.8.0',
+    'setuptools~=36.0.1',
     'markdown',
 ] + pytest_runner()
 
