@@ -34,6 +34,7 @@ INSTALL_REQUIRES = [
     'pytz>=2017.02',
     'setuptools~=36.0.1',
     'markdown',
+    'mutagen'
 ] + pytest_runner()
 
 TESTS_REQUIRE = [
