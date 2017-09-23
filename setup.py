@@ -38,7 +38,7 @@ INSTALL_REQUIRES = [
 ] + pytest_runner()
 
 TESTS_REQUIRE = [
-    'pytest~=3.2.1',
+    'pytest>=3.1.0',
     'pytest-pylint~=0.7.1'
 ]
 
