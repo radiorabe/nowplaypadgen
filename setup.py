@@ -51,8 +51,7 @@ ENTRY_POINTS = {
 setup(
     name='nowplaypadgen',
     version=get_version(),
-    description=('DAB+ now playing PAD ',
-                 '(DLS+ and MOT SLS generator)'),
+    description='DAB+ now playing PAD (DLS+ and MOT SLS generator)',
     long_description=readme(),
     url='https://github.com/radiorabe/nowplaypadgen',
     author='Christian Affolter',
