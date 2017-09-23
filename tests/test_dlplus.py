@@ -94,6 +94,25 @@ class DLPlusObjectTestSuite(unittest.TestCase):
             is not None)
 
 
+    def test_dummy_instance_creation(self):
+        """Test the creation of a new DL Plus dummy object"""
+
+        dlp_object = dlplus.DLPlusObject.create_dummy()
+
+        self.assertEqual(dlp_object.content_type, 'DUMMY')
+        self.assertEqual(dlp_object.text, '')
+        self.assertTrue(dlp_object.is_dummy())
+
+
+    def test_dummy_has_empty_text(self):
+        """Test that the text of a dummy object is set to an empty string"""
+
+        dlp_object = dlplus.DLPlusObject('DUMMY', 'not an empty string')
+
+        self.assertEqual(dlp_object.content_type, 'DUMMY')
+        self.assertEqual(dlp_object.text, '')
+
+
     def test_maximum_text_limit(self):
         """Test that a DL Plus Object's text can't be longer than 128 bytes"""
 
@@ -144,6 +163,27 @@ class DLPlusTagTestSuite(unittest.TestCase):
         self.assertEqual(dlp_tag.content_type, self.content_type)
         self.assertEqual(dlp_tag.start, self.start)
         self.assertEqual(dlp_tag.length, self.length)
+
+
+    def test_dummy_instance_creation(self):
+        """Test the creation of a new DL Plus dummy Tag"""
+
+        dlp_tag = dlplus.DLPlusTag.create_dummy()
+
+        self.assertEqual(dlp_tag.content_type, 'DUMMY')
+        self.assertEqual(dlp_tag.start, 0)
+        self.assertEqual(dlp_tag.length, 0)
+        self.assertTrue(dlp_tag.is_dummy())
+
+
+    def test_dummy_start_end_marker(self):
+        """Test that the start and end marker of a dummy tag will be set to 0"""
+
+        dlp_tag = dlplus.DLPlusTag('DUMMY', 10, 20)
+
+        self.assertEqual(dlp_tag.content_type, 'DUMMY')
+        self.assertEqual(dlp_tag.start, 0)
+        self.assertEqual(dlp_tag.length, 0)
 
 
     def test_invalid_start(self):

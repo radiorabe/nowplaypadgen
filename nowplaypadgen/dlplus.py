@@ -48,10 +48,10 @@ import datetime
 import pytz
 from future.utils import python_2_unicode_compatible
 
-# @TODO: - Add support for dummy objects
-#        - Add support for delete objects
+# @TODO: - Add support for delete objects
 #        - Add support for item toggle and running bit
 #        - Add an DL Plus object container
+#        - Linking of DL Plus objects
 
 #: Content type categories according to chapter 5.1 of ETSI TS 102 980
 CATEGORIES = ['Dummy', 'Item', 'Info', 'Programme',
@@ -706,6 +706,18 @@ class DLPlusContentType(object):
         """
         return CONTENT_TYPES[self.content_type]['category']
 
+
+    def is_dummy(self):
+        """Checks whether the instance is a "dummy" object
+
+        Checks whether the :attr:`content_type`of the instance is set to `DUMMY`
+
+        :return: `True` if the instance is a dummy object, otherwise `False`
+        :rtype: bool
+        """
+        return bool(self.content_type == 'DUMMY')
+
+
     def __str__(self):
         """Returns the content type
 
@@ -752,12 +764,29 @@ class DLPlusObject(DLPlusContentType):
             raise DLPlusObjectError(
                 'Text is longer than {} bytes'.format(MAXIMUM_TEXT_LIMIT))
 
+        # DL Plus dummy objects always have their text set to an empty string
+        if self.is_dummy():
+            text = ''
+
         #: The text string of the DL Plus object
         self.text = text
 
         #: The creation time stamp of the DL Plus object in UTC
         self.creation_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
+
+    @classmethod
+    def create_dummy(cls):
+        """Factory which creates a new dummy object
+
+        The factory creates a new :class:`DLPlusObject` dummy object which has
+        the content type set to `DUMMY` and the text string to an empty value.
+
+        :return: Dummy DL Plus Object
+        :rtype: DLPlusObject
+        """
+
+        return cls('DUMMY', '')
 
 
     def __str__(self):
@@ -800,7 +829,7 @@ class DLPlusTag(DLPlusContentType):
                                 integer.
         """
 
-        # Call the parent constructor which will asign self.content_type
+        # Call the parent constructor which will assign self.content_type
         super(DLPlusTag, self).__init__(content_type)
 
         if not isinstance(start, int) or start < 0:
@@ -809,7 +838,14 @@ class DLPlusTag(DLPlusContentType):
         if not isinstance(length, int) or length < 0:
             raise DLPlusTagError('length must be a positive integer')
 
+
         self.content_type = content_type
+
+        # Dummy objects always have their start and length marker set to 0
+        if self.is_dummy():
+            start = 0
+            length = 0
+
         self.start = start
         self.length = length
 
@@ -823,6 +859,8 @@ class DLPlusTag(DLPlusContentType):
         doesn't has to calculate and specify the `start` and `length` markers.
 
         :param DLPlusMessage dlp_message: The populated DL Plus message
+        :return: DL Plus Tag
+        :rtype: DLPlusTag
         """
 
         # Pythonic factory class method according to:
@@ -852,3 +890,18 @@ class DLPlusTag(DLPlusContentType):
         length = len(dlp_object.text)
 
         return cls(content_type, start, length)
+
+
+    @classmethod
+    def create_dummy(cls):
+        """Factory which creates a new dummy instance
+
+        The factory creates a new :class:`DLPlusTag` dummy instance which has
+        the content type set to `DUMMY` and the start and length marker set to
+        0 (zero).
+
+        :return: Dummy DL Plus Tag
+        :rtype: DLPlusTag
+        """
+
+        return cls('DUMMY', 0, 0)
