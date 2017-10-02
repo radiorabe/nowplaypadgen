@@ -142,6 +142,13 @@ class DLPlusObjectTestSuite(unittest.TestCase):
                          str(context_manager.exception))
 
 
+    def test_delete_object_creation(self):
+        """Test the creation of a new DL Plus delete object"""
+
+        dlp_object = dlplus.DLPlusObject(self.content_type, self.text, True)
+
+        self.assertTrue(dlp_object.is_delete)
+
 
 class DLPlusTagTestSuite(unittest.TestCase):
     """DLPlusTag test cases."""
@@ -377,9 +384,32 @@ class DLPlusMessageTestSuite(unittest.TestCase):
 
         self.assertTrue('ITEM.TITLE' in dlp_objects)
         self.assertEqual(dlp_objects['ITEM.TITLE'].text, self.title)
+        self.assertFalse(dlp_objects['ITEM.TITLE'].is_delete)
 
         self.assertTrue('ITEM.ARTIST' in dlp_objects)
         self.assertEqual(dlp_objects['ITEM.ARTIST'].text, self.artist)
+        self.assertFalse(dlp_objects['ITEM.ARTIST'].is_delete)
+
+
+    def test_dlp_delete_object(self):
+        """Test the retrieval of a DL Plus delete object"""
+
+        content_type = 'INFO.NEWS'
+
+        # Set the start marker to a blank character ('Now playing: ') and the
+        # length marker to 0.
+        dlp_delete_tag = dlplus.DLPlusTag(content_type, 12, 0)
+        self.dlp_msg.add_dlp_tag(dlp_delete_tag)
+
+        self.dlp_msg.parse(self.message_string)
+
+        dlp_objects = self.dlp_msg.get_dlp_objects()
+
+        # A dictionary with one DLPlusObject object that has the delete flag
+        # set to True is expected.
+        self.assertTrue(isinstance(dlp_objects, dict))
+        self.assertTrue(content_type in dlp_objects)
+        self.assertTrue(dlp_objects[content_type].is_delete)
 
 
     def test_build_message(self):
