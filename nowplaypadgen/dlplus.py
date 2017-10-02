@@ -48,8 +48,7 @@ import datetime
 import pytz
 from future.utils import python_2_unicode_compatible
 
-# @TODO: - Add support for delete objects
-#        - Add support for item toggle and running bit
+# @TODO: - Add support for item toggle and running bit
 #        - Add an DL Plus object container
 #        - Linking of DL Plus objects
 
@@ -568,8 +567,14 @@ class DLPlusMessage(object):
             dlp_tag = self._dlp_tags[content_type]
             end = dlp_tag.start + dlp_tag.length
 
+            # Delete objects have their length marker set to 0 and the start
+            # marker set to a blank character, according to ETSI TS 102 980,
+            # 6.2 Creating a delete object
+            delete = bool(
+                dlp_tag.length == 0 and message[dlp_tag.start:end+1] == ' ')
+
             self._dlp_objects[dlp_tag.content_type] = DLPlusObject(
-                dlp_tag.content_type, message[dlp_tag.start:end])
+                dlp_tag.content_type, message[dlp_tag.start:end], delete)
 
         self._message = message
         self._parsed = True
@@ -734,7 +739,7 @@ class DLPlusObject(DLPlusContentType):
     DL Plus object which holds a text string with a defined content type.
     """
 
-    def __init__(self, content_type, text=''):
+    def __init__(self, content_type, text='', delete=False):
         """Constructor for a DL Plus Object
 
         Creates a new :class:`DLPlusObject` object with a specific content type
@@ -749,12 +754,13 @@ class DLPlusObject(DLPlusContentType):
                                  Annex A (List of DL Plus content types), Table
                                  A.1
         :param str text: The DL Plus object text string
+        :param bool delete: If `True` the object is a DL Plus Delete object
         :raises DLPlusContentTypeError: if an invalid content type was specified
         :raises DLPlusMessageError: if the text exceeds the maximum allowed size
                                     in bytes (:attr:`MAXIMUM_TEXT_LIMIT`).
         """
 
-        # Call the parent constructor which will asign self.content_type
+        # Call the parent constructor which will assign self.content_type
         super(DLPlusObject, self).__init__(content_type)
 
         # Make sure that the byte length of the text doesn't exceed the maximum
@@ -770,6 +776,9 @@ class DLPlusObject(DLPlusContentType):
 
         #: The text string of the DL Plus object
         self.text = text
+
+        #: Flag which specifies whether the DL Plus object is a Delete object
+        self.is_delete = delete
 
         #: The creation time stamp of the DL Plus object in UTC
         self.creation_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
