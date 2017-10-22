@@ -113,6 +113,28 @@ class DLPlusObjectTestSuite(unittest.TestCase):
         self.assertEqual(dlp_object.text, '')
 
 
+    def test_delete_object(self):
+        """Test the deletion of a DL Plus Object"""
+
+        dlp_object = dlplus.DLPlusObject(self.content_type, self.text)
+
+        # Assure that the deletion time stamp is initially set to None
+        self.assertIsNone(dlp_object.expiration_ts)
+
+        # Expire the object by setting its deletion time stamp to the current
+        # date and time in UTC
+        dlp_object.expire()
+
+        # Assure that a TZ aware UTC datetime object is available
+        self.assertEqual(dlp_object.expiration_ts.tzinfo, pytz.utc)
+        self.assertIsNotNone(
+            dlp_object.creation_ts.tzinfo.utcoffset(dlp_object.creation_ts))
+
+        # Assure that the datetime object was set correctly
+        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        self.assertTrue(dlp_object.expiration_ts <= now)
+
+
     def test_maximum_text_limit(self):
         """Test that a DL Plus Object's text can't be longer than 128 bytes"""
 

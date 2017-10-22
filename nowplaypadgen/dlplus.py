@@ -783,6 +783,18 @@ class DLPlusObject(DLPlusContentType):
         #: The creation time stamp of the DL Plus object in UTC
         self.creation_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
+        #: The expiration (deletion) time stamp of the DL Plus object in UTC
+        self.expiration_ts = None
+
+    def expire(self):
+        """Sets the expiration (deletion) time stamp to the current time in UTC
+
+        This method should be called if the current DL Plus object gets updated
+        by a new one or an explicit delete object has been received. It will set
+        :attr:`expiration_ts` to a TZ aware :class:`datetime.datetime` object
+        representing the current time in UTC.
+        """
+        self.expiration_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
     @classmethod
     def create_dummy(cls):
