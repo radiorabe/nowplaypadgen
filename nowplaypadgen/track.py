@@ -95,6 +95,6 @@ class Track(timeperiod.TimePeriod):
         :rtype: str
         """
         return 'Track: {0} - {1} ({2})'.format(
-            self.artist.encode('utf8', 'replace'),
-            self.title.encode('utf8', 'replace'),
+            self.artist,
+            self.title,
             self.uid)
