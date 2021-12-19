@@ -1,4 +1,4 @@
-"""Dynamic Label Plus (DL Plus) module
+"""Dynamic Label Plus (DL Plus) module.
 
 This module offers various classes which help to deal with the DAB+ Dynamic
 Label Plus (DL Plus) text feature, as defined in  `ETSI TS 102 980
@@ -45,412 +45,359 @@ Example ASCII art representation::
 """
 
 import datetime
+
 import pytz
-from future.utils import python_2_unicode_compatible
 
 # @TODO: - Add support for item toggle and running bit
 #        - Add an DL Plus object container
 #        - Linking of DL Plus objects
 
 #: Content type categories according to chapter 5.1 of ETSI TS 102 980
-CATEGORIES = ['Dummy', 'Item', 'Info', 'Programme',
-              'Interactivity', 'Private', 'Descriptor']
+CATEGORIES = [
+    "Dummy",
+    "Item",
+    "Info",
+    "Programme",
+    "Interactivity",
+    "Private",
+    "Descriptor",
+]
 
 #: Content types according to ETSI TS 102 980, Annex A, Table A.1
 CONTENT_TYPES = {
-    'DUMMY': {
-        'code': 0,
-        'category': CATEGORIES[0],
-        'id3v1': None,
-        'id3v2': None
+    "DUMMY": {"code": 0, "category": CATEGORIES[0], "id3v1": None, "id3v2": None},
+    "ITEM.TITLE": {
+        "code": 1,
+        "category": CATEGORIES[1],
+        "id3v1": "TITLE",
+        "id3v2": "TIT2",
     },
-    'ITEM.TITLE': {
-        'code': 1,
-        'category': CATEGORIES[1],
-        'id3v1': 'TITLE',
-        'id3v2': 'TIT2'
+    "ITEM.ALBUM": {
+        "code": 2,
+        "category": CATEGORIES[1],
+        "id3v1": "ALBUM",
+        "id3v2": "TALB",
     },
-    'ITEM.ALBUM': {
-        'code': 2,
-        'category': CATEGORIES[1],
-        'id3v1': 'ALBUM',
-        'id3v2': 'TALB'
+    "ITEM.TRACKNUMBER": {
+        "code": 3,
+        "category": CATEGORIES[1],
+        "id3v1": "TRACKNUM",
+        "id3v2": "TRCK",
     },
-    'ITEM.TRACKNUMBER': {
-        'code': 3,
-        'category': CATEGORIES[1],
-        'id3v1': 'TRACKNUM',
-        'id3v2': 'TRCK'
+    "ITEM.ARTIST": {
+        "code": 4,
+        "category": CATEGORIES[1],
+        "id3v1": "ARTIST",
+        "id3v2": "TPE1",
     },
-    'ITEM.ARTIST': {
-        'code': 4,
-        'category': CATEGORIES[1],
-        'id3v1': 'ARTIST',
-        'id3v2': 'TPE1'
+    "ITEM.COMPOSITION": {
+        "code": 5,
+        "category": CATEGORIES[1],
+        "id3v1": "COMPOSITION",
+        "id3v2": "TIT1",
     },
-    'ITEM.COMPOSITION': {
-        'code': 5,
-        'category': CATEGORIES[1],
-        'id3v1': 'COMPOSITION',
-        'id3v2': 'TIT1'
+    "ITEM.MOVEMENT": {
+        "code": 6,
+        "category": CATEGORIES[1],
+        "id3v1": "MOVEMENT",
+        "id3v2": "TIT3",
     },
-    'ITEM.MOVEMENT': {
-        'code': 6,
-        'category': CATEGORIES[1],
-        'id3v1': 'MOVEMENT',
-        'id3v2': 'TIT3'
+    "ITEM.CONDUCTOR": {
+        "code": 7,
+        "category": CATEGORIES[1],
+        "id3v1": "CONDUCTOR",
+        "id3v2": "TPE3",
     },
-    'ITEM.CONDUCTOR': {
-        'code': 7,
-        'category': CATEGORIES[1],
-        'id3v1': 'CONDUCTOR',
-        'id3v2': 'TPE3'
+    "ITEM.COMPOSER": {
+        "code": 8,
+        "category": CATEGORIES[1],
+        "id3v1": "COMPOSER",
+        "id3v2": "TCOM",
     },
-    'ITEM.COMPOSER': {
-        'code': 8,
-        'category': CATEGORIES[1],
-        'id3v1': 'COMPOSER',
-        'id3v2': 'TCOM'
+    "ITEM.BAND": {
+        "code": 9,
+        "category": CATEGORIES[1],
+        "id3v1": "BAND",
+        "id3v2": "TPE2",
     },
-    'ITEM.BAND': {
-        'code': 9,
-        'category': CATEGORIES[1],
-        'id3v1': 'BAND',
-        'id3v2': 'TPE2'
+    "ITEM.COMMENT": {
+        "code": 10,
+        "category": CATEGORIES[1],
+        "id3v1": "COMMENT",
+        "id3v2": "COMM",
     },
-    'ITEM.COMMENT': {
-        'code': 10,
-        'category': CATEGORIES[1],
-        'id3v1': 'COMMENT',
-        'id3v2': 'COMM'
+    "ITEM.GENRE ": {
+        "code": 11,
+        "category": CATEGORIES[1],
+        "id3v1": "CONTENTTYPE",
+        "id3v2": "TCON",
     },
-    'ITEM.GENRE ': {
-        'code': 11,
-        'category': CATEGORIES[1],
-        'id3v1': 'CONTENTTYPE',
-        'id3v2': 'TCON'
+    "INFO.NEWS": {"code": 12, "category": CATEGORIES[2], "id3v1": None, "id3v2": None},
+    "INFO.NEWS.LOCAL": {
+        "code": 13,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.NEWS': {
-        'code': 12,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.STOCKMARKET": {
+        "code": 14,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.NEWS.LOCAL': {
-        'code': 13,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.SPORT": {"code": 15, "category": CATEGORIES[2], "id3v1": None, "id3v2": None},
+    "INFO.LOTTERY": {
+        "code": 16,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.STOCKMARKET': {
-        'code': 14,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.HOROSCOPE": {
+        "code": 17,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.SPORT': {
-        'code': 15,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.DAILY_DIVERSION": {
+        "code": 18,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.LOTTERY': {
-        'code': 16,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.HEALTH": {
+        "code": 19,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.HOROSCOPE': {
-        'code': 17,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.EVENT": {"code": 20, "category": CATEGORIES[2], "id3v1": None, "id3v2": None},
+    "INFO.SCENE": {"code": 21, "category": CATEGORIES[2], "id3v1": None, "id3v2": None},
+    "INFO.CINEMA": {
+        "code": 22,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.DAILY_DIVERSION': {
-        'code': 18,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.TV": {"code": 23, "category": CATEGORIES[2], "id3v1": None, "id3v2": None},
+    "INFO.DATE_TIME": {
+        "code": 24,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.HEALTH': {
-        'code': 19,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.WEATHER": {
+        "code": 25,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.EVENT': {
-        'code': 20,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.TRAFFIC": {
+        "code": 26,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.SCENE': {
-        'code': 21,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.ALARM": {"code": 27, "category": CATEGORIES[2], "id3v1": None, "id3v2": None},
+    "INFO.ADVERTISEMENT": {
+        "code": 28,
+        "category": CATEGORIES[2],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.CINEMA': {
-        'code': 22,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "INFO.URL": {"code": 29, "category": CATEGORIES[2], "id3v1": None, "id3v2": None},
+    "INFO.OTHER": {"code": 30, "category": CATEGORIES[2], "id3v1": None, "id3v2": None},
+    "STATIONNAME.SHORT": {
+        "code": 31,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.TV': {
-        'code': 23,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "STATIONNAME.LONG": {
+        "code": 32,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.DATE_TIME': {
-        'code': 24,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "PROGRAMME.NOW": {
+        "code": 33,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.WEATHER': {
-        'code': 25,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "PROGRAMME.NEXT": {
+        "code": 34,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.TRAFFIC': {
-        'code': 26,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "PROGRAMME.PART": {
+        "code": 35,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.ALARM': {
-        'code': 27,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "PROGRAMME.HOST": {
+        "code": 36,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.ADVERTISEMENT': {
-        'code': 28,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "PROGRAMME.EDITORIAL_STAFF": {
+        "code": 37,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.URL': {
-        'code': 29,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "PROGRAMME.FREQUENCY ": {
+        "code": 38,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'INFO.OTHER': {
-        'code': 30,
-        'category': CATEGORIES[2],
-        'id3v1': None,
-        'id3v2': None
+    "PROGRAMME.HOMEPAGE": {
+        "code": 39,
+        "category": CATEGORIES[3],
+        "id3v1": "WWWRADIOPAGE",
+        "id3v2": "WORS",
     },
-    'STATIONNAME.SHORT': {
-        'code': 31,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "PROGRAMME.SUBCHANNEL": {
+        "code": 40,
+        "category": CATEGORIES[3],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'STATIONNAME.LONG': {
-        'code': 32,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "PHONE.HOTLINE": {
+        "code": 41,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PROGRAMME.NOW': {
-        'code': 33,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "PHONE.STUDIO": {
+        "code": 42,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PROGRAMME.NEXT': {
-        'code': 34,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "PHONE.OTHER": {
+        "code": 43,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PROGRAMME.PART': {
-        'code': 35,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "SMS.STUDIO": {"code": 44, "category": CATEGORIES[4], "id3v1": None, "id3v2": None},
+    "SMS.OTHER": {"code": 45, "category": CATEGORIES[4], "id3v1": None, "id3v2": None},
+    "EMAIL.HOTLINE": {
+        "code": 46,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PROGRAMME.HOST': {
-        'code': 36,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "EMAIL.STUDIO": {
+        "code": 47,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PROGRAMME.EDITORIAL_STAFF': {
-        'code': 37,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "EMAIL.OTHER": {
+        "code": 48,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PROGRAMME.FREQUENCY ': {
-        'code': 38,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "MMS.OTHER": {"code": 49, "category": CATEGORIES[4], "id3v1": None, "id3v2": None},
+    "CHAT": {"code": 50, "category": CATEGORIES[4], "id3v1": None, "id3v2": None},
+    "CHAT.CENTER": {
+        "code": 51,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PROGRAMME.HOMEPAGE': {
-        'code': 39,
-        'category': CATEGORIES[3],
-        'id3v1': 'WWWRADIOPAGE',
-        'id3v2': 'WORS'
+    "VOTE.QUESTION": {
+        "code": 52,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PROGRAMME.SUBCHANNEL': {
-        'code': 40,
-        'category': CATEGORIES[3],
-        'id3v1': None,
-        'id3v2': None
+    "VOTE.CENTRE": {
+        "code": 53,
+        "category": CATEGORIES[4],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PHONE.HOTLINE': {
-        'code': 41,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
+    "DESCRIPTOR.PLACE": {
+        "code": 59,
+        "category": CATEGORIES[6],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PHONE.STUDIO': {
-        'code': 42,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
+    "DESCRIPTOR.APPOINTMENT": {
+        "code": 60,
+        "category": CATEGORIES[6],
+        "id3v1": None,
+        "id3v2": None,
     },
-    'PHONE.OTHER': {
-        'code': 43,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
+    "DESCRIPTOR.IDENTIFIER": {
+        "code": 61,
+        "category": CATEGORIES[6],
+        "id3v1": "ISRC",
+        "id3v2": "TSRC",
     },
-    'SMS.STUDIO': {
-        'code': 44,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
+    "DESCRIPTOR.PURCHASE": {
+        "code": 62,
+        "category": CATEGORIES[6],
+        "id3v1": "WWWPAYMENT",
+        "id3v2": "WPAY",
     },
-    'SMS.OTHER': {
-        'code': 45,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'EMAIL.HOTLINE': {
-        'code': 46,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'EMAIL.STUDIO': {
-        'code': 47,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'EMAIL.OTHER': {
-        'code': 48,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'MMS.OTHER': {
-        'code': 49,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'CHAT': {
-        'code': 50,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'CHAT.CENTER': {
-        'code': 51,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'VOTE.QUESTION': {
-        'code': 52,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'VOTE.CENTRE': {
-        'code': 53,
-        'category': CATEGORIES[4],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'DESCRIPTOR.PLACE': {
-        'code': 59,
-        'category': CATEGORIES[6],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'DESCRIPTOR.APPOINTMENT': {
-        'code': 60,
-        'category': CATEGORIES[6],
-        'id3v1': None,
-        'id3v2': None
-    },
-    'DESCRIPTOR.IDENTIFIER': {
-        'code': 61,
-        'category': CATEGORIES[6],
-        'id3v1': 'ISRC',
-        'id3v2': 'TSRC'
-    },
-    'DESCRIPTOR.PURCHASE': {
-        'code': 62,
-        'category': CATEGORIES[6],
-        'id3v1': 'WWWPAYMENT',
-        'id3v2': 'WPAY'
-    },
-    'DESCRIPTOR.GET_DATA': {
-        'code': 63,
-        'category': CATEGORIES[6],
-        'id3v1': None,
-        'id3v2': None
+    "DESCRIPTOR.GET_DATA": {
+        "code": 63,
+        "category": CATEGORIES[6],
+        "id3v1": None,
+        "id3v2": None,
     },
 }
 
 #: The maximum text limit in bytes according to ETSI TS 102 980, 5.0
 MAXIMUM_TEXT_LIMIT = 128
 
+
 class DLPlusError(Exception):
-    """Base exception for DL Plus"""
+    """Base exception for DL Plus."""
+
 
 class DLPlusMessageError(DLPlusError):
-    """DL Plus message related exceptions"""
+    """DL Plus message related exceptions."""
+
 
 class DLPlusContentTypeError(DLPlusError):
-    """DL Plus content type related exceptions"""
+    """DL Plus content type related exceptions."""
+
 
 class DLPlusTagError(DLPlusError):
-    """DL Plus tag related exceptions"""
+    """DL Plus tag related exceptions."""
+
 
 class DLPlusObjectError(DLPlusError):
-    """DL Plus object related exceptions"""
+    """DL Plus object related exceptions."""
 
 
 class DLPlusMessage(object):
-    """Dynamic Label Plus (DL Plus) message
+    """Dynamic Label Plus (DL Plus) message.
 
     This class supports parsing or building a DL Plus message string
     """
 
     def __init__(self):
-        """Constructor for the DLPlusMessage
+        """Create class:`DLPlusMessage` instance.
 
-	Creates a new :class:`DLPlusMessage` object which can be used to parse
-	or build a DL Plus message string.
-	"""
+        Creates a new :class:`DLPlusMessage` object which can be used to parse
+        or build a DL Plus message string.
+        """
 
         #: The format string from which the message will be built
-        self.format_string = ''
+        self.format_string = ""
 
         #: The formatted DL Plus message
-        self._message = ''
+        self._message = ""
 
         #: Dictionary holding the assigned DL Plus objects
         self._dlp_objects = {}
@@ -464,49 +411,46 @@ class DLPlusMessage(object):
         #: Status if the message was successfully built
         self._built = False
 
-
     def add_dlp_object(self, dlp_object):
         """Add a :class:`DLPlusObject` to a message string.
 
-        This method is intended to be used before building a DL Plus Message.
-        It allows one to add up to four :class:`DLPlusObject` objects which
-        will replace the corresponding content type patterns (e.g.
-        ``{ITEM.TITLE}``) present within the
-        :attr:`DLPlusMessage.format_string`. After adding all DL Plus objects,
-        :meth:`DLPlusMessage.build()` has to be called.
+            This method is intended to be used before building a DL Plus Message.
+            It allows one to add up to four :class:`DLPlusObject` objects which
+            will replace the corresponding content type patterns (e.g.
+            ``{ITEM.TITLE}``) present within the
+            :attr:`DLPlusMessage.format_string`. After adding all DL Plus objects,
+            :meth:`DLPlusMessage.build()` has to be called.
 
-	:param DLPlusObject dlp_object: The DL Plus Object to add
-	:raises DLPlusMessageError: when `dlp_object` is not a
-                                    :class:`DLPlusObject` object, or the
-                                    maximum of four :class:`DLPlusObject`
-                                    objects where already added.
+        :param DLPlusObject dlp_object: The DL Plus Object to add
+        :raises DLPlusMessageError: when `dlp_object` is not a
+                                        :class:`DLPlusObject` object, or the
+                                        maximum of four :class:`DLPlusObject`
+                                        objects where already added.
         """
 
         if not isinstance(dlp_object, DLPlusObject):
-            raise DLPlusMessageError(
-                "dlp_object has to be a DLPlusObject object")
+            raise DLPlusMessageError("dlp_object has to be a DLPlusObject object")
 
         # Up to four DL Plus objects can be created from each DL message
         # according to ETSI TS 102 980, 5.1
         if len(self._dlp_objects) >= 4:
             raise DLPlusMessageError(
-                "Only a maximum of 4 DLPlusObject objects can be added")
+                "Only a maximum of 4 DLPlusObject objects can be added"
+            )
 
         # Use the content_type of the DL Plus object as the dictionary key
         self._dlp_objects[dlp_object.content_type] = dlp_object
 
-
     def get_dlp_objects(self):
-        """Returns the associated DL Plus objects (:class:`DLPlusObject`)
+        """Return the associated DL Plus objects (:class:`DLPlusObject`).
 
         :return: Dictionary of :class:`DLPlusObject` objects.
         :rtype: dict
         """
         return self._dlp_objects
 
-
     def add_dlp_tag(self, dlp_tag):
-        """Add a :class:`DLPlusTag` required for parsing the message
+        """Add a :class:`DLPlusTag` required for parsing the message.
 
         This method is intended to be used before parsing a DL Plus Message.
         It allows one to add up to four :class:`DLPlusTag` objects which will
@@ -522,28 +466,27 @@ class DLPlusMessage(object):
         """
 
         if not isinstance(dlp_tag, DLPlusTag):
-            raise DLPlusMessageError('dlp_tag has to be a DLPlusTag object')
+            raise DLPlusMessageError("dlp_tag has to be a DLPlusTag object")
 
         # Up to four DL Plus tags can be created from each DL message
         # according to ETSI TS 102 980, 5.1
         if len(self._dlp_tags) >= 4:
             raise DLPlusMessageError(
-                "Only a maximum of 4 DLPlusTag objects can be added")
+                "Only a maximum of 4 DLPlusTag objects can be added"
+            )
 
         self._dlp_tags[dlp_tag.content_type] = dlp_tag
 
-
     def get_dlp_tags(self):
-        """Returns the associated DL Plus tags (:class:`DLPlusTag`)
+        """Return the associated DL Plus tags (:class:`DLPlusTag`).
 
         :return: Dictionary of :class:`DLPlusTag` objects.
         :rtype: dict
         """
         return self._dlp_tags
 
-
     def parse(self, message):
-        """Parsing a DL Plus `message` into DL Plus objects
+        """Parse a DL Plus `message` into DL Plus objects.
 
         This method parses a given DL Plus `message` into zero or more DL Plus
         objects (:class:`DLPlusObject`), according to the associated DL Plus
@@ -571,17 +514,18 @@ class DLPlusMessage(object):
             # marker set to a blank character, according to ETSI TS 102 980,
             # 6.2 Creating a delete object
             delete = bool(
-                dlp_tag.length == 0 and message[dlp_tag.start:end+1] == ' ')
+                dlp_tag.length == 0 and message[dlp_tag.start : end + 1] == " "
+            )
 
             self._dlp_objects[dlp_tag.content_type] = DLPlusObject(
-                dlp_tag.content_type, message[dlp_tag.start:end], delete)
+                dlp_tag.content_type, message[dlp_tag.start : end], delete
+            )
 
         self._message = message
         self._parsed = True
 
-
     def build(self, format_string):
-        """Build a DL Plus message from a given format and DL Plus objects
+        """Build a DL Plus message from a given format and DL Plus objects.
 
         This method builds a DL Plus message string from a given
         `format_string` and up to four DL Plus objects (:class:`DLPlusObject`).
@@ -621,9 +565,10 @@ class DLPlusMessage(object):
 
         # Make sure that the byte length of the message doesn't exceed the
         # maximum allowed limit.
-        if len(message.encode('utf-8')) > MAXIMUM_TEXT_LIMIT:
+        if len(message.encode("utf-8")) > MAXIMUM_TEXT_LIMIT:
             raise DLPlusMessageError(
-                'Message is longer than {} bytes'.format(MAXIMUM_TEXT_LIMIT))
+                f"Message is longer than {MAXIMUM_TEXT_LIMIT} bytes"
+            )
 
         self._message = message
 
@@ -634,23 +579,22 @@ class DLPlusMessage(object):
         for content_type in self._dlp_objects:
             dlp_object = self._dlp_objects[content_type]
             self._dlp_tags[dlp_object.content_type] = DLPlusTag.from_message(
-                self, dlp_object.content_type)
+                self, dlp_object.content_type
+            )
 
         self._built = True
 
-
     @property
     def message(self):
-        """Getter for :attr:`_message`
+        """Get :attr:`_message`.
 
         :return: Formatted DL Plus Message
         :rtype: str
         """
         return self._message
 
-
     def __str__(self):
-        """Returns the formatted DL Plus Message
+        """Return the formatted DL Plus Message.
 
         :return: Formatted DL Plus Message
         :rtype: str
@@ -660,10 +604,10 @@ class DLPlusMessage(object):
 
 
 class DLPlusContentType(object):
-    """Dynamic Label Plus content type"""
+    """Dynamic Label Plus content type."""
 
     def __init__(self, content_type):
-        """Constructor
+        """Create class:`DLPlusContentType` instance.
 
         Creates a new :class:`DLPlusContentType` object with a specific content
         type (`content_type`)
@@ -680,15 +624,13 @@ class DLPlusContentType(object):
         """
 
         if content_type not in CONTENT_TYPES:
-            raise DLPlusContentTypeError(
-                'Invalid content_type: {}'.format(content_type))
+            raise DLPlusContentTypeError(f"Invalid content_type: {content_type}")
 
         #: The content type according to ETSI TS 102 980, Annex A, Table A.1
         self.content_type = content_type
 
-
     def get_code(self):
-        """Get the content type code
+        """Get the content type code.
 
         Returns the content type code according to ETSI TS 102 980, Annex A
         (List of DL Plus content types), Table A.1.
@@ -697,11 +639,10 @@ class DLPlusContentType(object):
         :rtype: int
         """
 
-        return CONTENT_TYPES[self.content_type]['code']
-
+        return CONTENT_TYPES[self.content_type]["code"]
 
     def get_category(self):
-        """Get the content type category
+        """Get the content type category.
 
         Returns the content type category according to ETSI TS 102 980, Annex A
         (List of DL Plus content types), Table A.1.
@@ -709,22 +650,20 @@ class DLPlusContentType(object):
         :return: category string
         :rtype: str
         """
-        return CONTENT_TYPES[self.content_type]['category']
-
+        return CONTENT_TYPES[self.content_type]["category"]
 
     def is_dummy(self):
-        """Checks whether the instance is a "dummy" object
+        """Check whether the instance is a "dummy" object.
 
         Checks whether the :attr:`content_type`of the instance is set to `DUMMY`
 
         :return: `True` if the instance is a dummy object, otherwise `False`
         :rtype: bool
         """
-        return bool(self.content_type == 'DUMMY')
-
+        return bool(self.content_type == "DUMMY")
 
     def __str__(self):
-        """Returns the content type
+        """Return the content type.
 
         :return: DL Plus content type
         :rtype: str
@@ -732,15 +671,14 @@ class DLPlusContentType(object):
         return self.content_type
 
 
-@python_2_unicode_compatible
 class DLPlusObject(DLPlusContentType):
-    """Dynamic Label Plus (DL Plus) object
+    """Dynamic Label Plus (DL Plus) object.
 
     DL Plus object which holds a text string with a defined content type.
     """
 
-    def __init__(self, content_type, text='', delete=False):
-        """Constructor for a DL Plus Object
+    def __init__(self, content_type, text="", delete=False):
+        """Create a class:`DLPlusObject` instance.
 
         Creates a new :class:`DLPlusObject` object with a specific content type
         (`content_type`) and the corresponding text string (`text`).
@@ -766,13 +704,12 @@ class DLPlusObject(DLPlusContentType):
         # Make sure that the byte length of the text doesn't exceed the maximum
         # allowed limit.
         # https://stackoverflow.com/a/4013418/8587602
-        if len(text.encode('utf-8')) > MAXIMUM_TEXT_LIMIT:
-            raise DLPlusObjectError(
-                'Text is longer than {} bytes'.format(MAXIMUM_TEXT_LIMIT))
+        if len(text.encode("utf-8")) > MAXIMUM_TEXT_LIMIT:
+            raise DLPlusObjectError(f"Text is longer than {MAXIMUM_TEXT_LIMIT} bytes")
 
         # DL Plus dummy objects always have their text set to an empty string
         if self.is_dummy():
-            text = ''
+            text = ""
 
         #: The text string of the DL Plus object
         self.text = text
@@ -787,7 +724,7 @@ class DLPlusObject(DLPlusContentType):
         self.expiration_ts = None
 
     def expire(self):
-        """Sets the expiration (deletion) time stamp to the current time in UTC
+        """Set the expiration (deletion) time stamp to the current time in UTC.
 
         This method should be called if the current DL Plus object gets updated
         by a new one or an explicit delete object has been received. It will set
@@ -798,7 +735,7 @@ class DLPlusObject(DLPlusContentType):
 
     @classmethod
     def create_dummy(cls):
-        """Factory which creates a new dummy object
+        """Create a dummy class:`DLPlusObject` instance.
 
         The factory creates a new :class:`DLPlusObject` dummy object which has
         the content type set to `DUMMY` and the text string to an empty value.
@@ -807,11 +744,10 @@ class DLPlusObject(DLPlusContentType):
         :rtype: DLPlusObject
         """
 
-        return cls('DUMMY', '')
-
+        return cls("DUMMY", "")
 
     def __str__(self):
-        """Returns the DL Plus object's text
+        """Return the DL Plus objects text.
 
         :return: DL Plus object text
         :rtype: str
@@ -819,16 +755,15 @@ class DLPlusObject(DLPlusContentType):
         return self.text
 
 
-@python_2_unicode_compatible
 class DLPlusTag(DLPlusContentType):
-    """Dynamic Label Plus (DL Plus) tag
+    """Dynamic Label Plus (DL Plus) tag.
 
     DL plus tag which defines a start and length marker together with a content
     type.
     """
 
     def __init__(self, content_type, start, length):
-        """Constructor for a DL Plus tag
+        """Create a class:`DLPlusTag` instance.
 
         Creates a new :class:`DLPlusTag` object with a specific content type
         (`content_type`) and defined `start` and `length` markers.
@@ -854,11 +789,10 @@ class DLPlusTag(DLPlusContentType):
         super(DLPlusTag, self).__init__(content_type)
 
         if not isinstance(start, int) or start < 0:
-            raise DLPlusTagError('start must be a positive integer')
+            raise DLPlusTagError("start must be a positive integer")
 
         if not isinstance(length, int) or length < 0:
-            raise DLPlusTagError('length must be a positive integer')
-
+            raise DLPlusTagError("length must be a positive integer")
 
         self.content_type = content_type
 
@@ -870,10 +804,9 @@ class DLPlusTag(DLPlusContentType):
         self.start = start
         self.length = length
 
-
     @classmethod
     def from_message(cls, dlp_message, content_type):
-        """Factory which creates a new instance from a :class:`DLPlusMessage`
+        """Create a class:`DLPlusTag` instance from a :class:`DLPlusMessage`.
 
         The factory creates a new :class:`DLPlusTag` object from an existing
         and already populated :class:`DLPlusMessage` object, this way one
@@ -892,8 +825,7 @@ class DLPlusTag(DLPlusContentType):
             raise DLPlusTagError("dlp_message has to be a DLPlusMessage")
 
         if content_type not in CONTENT_TYPES:
-            raise DLPlusContentTypeError(
-                'Invalid content_type: {}'.format(content_type))
+            raise DLPlusContentTypeError(f"Invalid content_type: {content_type}")
 
         # Check that a DLPlusObject object for the requested content type
         # was added and is available.
@@ -901,8 +833,8 @@ class DLPlusTag(DLPlusContentType):
             dlp_object = dlp_message.get_dlp_objects()[content_type]
         except KeyError:
             raise DLPlusTagError(
-                'No DLPlusObject for content type {} available'.format(
-                    content_type))
+                f"No DLPlusObject for content type {content_type} available"
+            )
 
         # Get the start marker (index) of the DL Plus object's text
         start = dlp_message.message.find(dlp_object.text)
@@ -912,12 +844,11 @@ class DLPlusTag(DLPlusContentType):
 
         return cls(content_type, start, length)
 
-
     @classmethod
     def create_dummy(cls):
-        """Factory which creates a new dummy instance
+        """Create a dummy instance of class:`DLPlusTag`.
 
-        The factory creates a new :class:`DLPlusTag` dummy instance which has
+        This factory creates a :class:`DLPlusTag` dummy instance which has
         the content type set to `DUMMY` and the start and length marker set to
         0 (zero).
 
@@ -925,4 +856,4 @@ class DLPlusTag(DLPlusContentType):
         :rtype: DLPlusTag
         """
 
-        return cls('DUMMY', 0, 0)
+        return cls("DUMMY", 0, 0)

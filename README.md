@@ -7,11 +7,11 @@ DAB+ now playing PAD (DLS+ and MOT SLS) generator
 ### Install requirements
 
 ```bash
-pip instrall -r requirements-dev.txt
+pip install -r requirements-dev.txt
 ```
 
 ### Run Tests
 
 ```bash
-pytest --cov=nowplaypadgen
+pytest
 ```
