@@ -1,4 +1,4 @@
-"""Show module for broadcast shows"""
+"""Show module for broadcast shows."""
 
 import uuid
 
@@ -6,7 +6,8 @@ from nowplaypadgen import timeperiod
 
 
 class ShowError(Exception):
-    """Show related exception"""
+    """Show related exception."""
+
     pass
 
 
@@ -46,21 +47,16 @@ class Show(timeperiod.TimePeriod):
     """
 
     def __init__(self, name=None, uid=uuid.uuid4()):
-        # type: (str, uuid.UUID) -> None
-        """Constructor for the show
+        """Create Show instance.
 
         :param str name: The name of the show.
         :param uuid.UUID uid: The UUID of the show.
         """
 
         self.name = name  #: The show's name
-
         self.uid = uid  #: The show's global unique identifier (UUID)
-
         self.description = None  #: The show's description
-
         self.url = None  #: The show's URL
-
         # Call the parent's constructor
         super(Show, self).__init__()
 
@@ -71,12 +67,4 @@ class Show(timeperiod.TimePeriod):
                  end time and URL.
         :rtype: str
         """
-        return ("Show '%(name)' (%(uid)), "
-                "start: '%(startime)', "
-                "end: '%(endtime)', "
-                "url: '%(url)'"
-               ).format(name=self.name,
-                        uid=self.uid,
-                        starttime=self.starttime,
-                        endtime=self.endtime,
-                        url=self.url)
+        return f"Show '{self.name}' ({self.uid}) start: {self.starttime}, end: {self.endtime}, url: {self.url}"

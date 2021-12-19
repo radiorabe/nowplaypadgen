@@ -1,47 +1,50 @@
-"""Audio Track module"""
+"""Audio Track module."""
 
 import uuid
+
 import mutagen
+
 from nowplaypadgen import timeperiod
 
+
 class TrackError(Exception):
-    """Track related exception"""
+    """Track related exception."""
+
     pass
 
 
 class Track(timeperiod.TimePeriod):
-    """Track class which represents an audio track
+    """Track class which represents an audio track.
 
-       A track has at least an artist, a title and an UUID. It can have a start
-       time, an end time and a length as well as additional optional meta tags.
+    A track has at least an artist, a title and an UUID. It can have a start
+    time, an end time and a length as well as additional optional meta tags.
 
-       Example::
+    Example::
 
-           my_track = track.Track('Example Artist', 'Example Title')
-           my_track.set_length(60) # The track has a one minute duration
+        my_track = track.Track('Example Artist', 'Example Title')
+        my_track.set_length(60) # The track has a one minute duration
     """
 
     def __init__(self, artist=None, title=None, uid=uuid.uuid4()):
-        """Constructor for the track
+        """Create :class:`track.Track` instance.
 
         :param str artist: The artist of the track
         :param str title: The title of the track
         :param str uid: The UUID of the track
         """
 
-        self.artist = artist #: The track's artist
-        self.title = title #: The track's title
-        self.uid = uid #: The track's global unique identifier (UUID)
+        self.artist = artist  #: The track's artist
+        self.title = title  #: The track's title
+        self.uid = uid  #: The track's global unique identifier (UUID)
 
-        self.tags = {} #: Optional meta tag dictionary of a track
+        self.tags = {}  #: Optional meta tag dictionary of a track
 
         # Call the parent's constructor
         super(Track, self).__init__()
 
-
     @classmethod
     def from_file(cls, track_path):
-        """Factory which creates a :class:`track.Track` object from a local file
+        """Create Factory for creating a :class:`track.Track` object from a local file.
 
         The factory uses :class:`mutagen.File` to parse the meta data (tags and
         length) of the audio file and adds it to a new :class:`track.Track`
@@ -64,8 +67,8 @@ class Track(timeperiod.TimePeriod):
         audio_file = mutagen.File(track_path)
 
         # Set first artist/title or assign None, if not present
-        artist = audio_file.get('artist', [None])[0]
-        title = audio_file.get('title', [None])[0]
+        artist = audio_file.get("artist", [None])[0]
+        title = audio_file.get("title", [None])[0]
 
         new_track = cls(artist, title)
         new_track.set_length(audio_file.info.length)
@@ -83,9 +86,8 @@ class Track(timeperiod.TimePeriod):
 
         return new_track
 
-
     def __str__(self):
-        """Returns a string representation of the track.
+        """Return a string representation of the track.
 
         Returns a string in the form of ``<ARTIST> - <TITLE> (<UUID>)`` useful
         for logging or a textual representation of the track.
@@ -94,7 +96,4 @@ class Track(timeperiod.TimePeriod):
         :return: String containing the track's artist and title
         :rtype: str
         """
-        return 'Track: {0} - {1} ({2})'.format(
-            self.artist,
-            self.title,
-            self.uid)
+        return "Track: {0} - {1} ({2})".format(self.artist, self.title, self.uid)

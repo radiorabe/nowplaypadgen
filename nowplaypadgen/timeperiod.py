@@ -1,43 +1,42 @@
-"""A Module which helps to deal with time periods"""
+"""A Module which helps to deal with time periods."""
 
 import datetime
+
 import pytz
 
+
 class TimePeriodError(Exception):
-    """TimePeriod related exception"""
+    """TimePeriod related exception."""
+
     pass
 
 
 class TimePeriod(object):
-    """TimePeriod class which represents a period in time
+    """TimePeriod class which represents a period in time.
 
-       A TimePeriod can have an absolute start and end date/time, a duration,
-       it can be active, started or already ended.
+    A TimePeriod can have an absolute start and end date/time, a duration,
+    it can be active, started or already ended.
     """
 
     def __init__(self):
-        """Constructor for the time period"""
+        """Create class:`TimePeriod` instance."""
 
-        self._starttime = None #: The period's start time, initially set to None
-
-        self._endtime = None #: The period's end time, initially set to None
-
-        self._duration = datetime.timedelta() #: The period's duration,
-
+        self._starttime = None  #: The period's start time, initially set to None
+        self._endtime = None  #: The period's end time, initially set to None
+        self._duration = datetime.timedelta()  #: The period's duration,
 
     @property
     def starttime(self):
-        """Getter for starttime
+        """Get starttime.
 
         :return: The absolute start time of the period in UTC
         :rtype: datetime.datetime
         """
         return self._starttime
 
-
     @starttime.setter
     def starttime(self, starttime):
-        """Setter for starttime which checks for a TZ aware datetime object
+        """Setter for starttime which checks for a TZ aware datetime object.
 
         The setter also updates the period's duration if and endtime was
         already set.
@@ -52,8 +51,7 @@ class TimePeriod(object):
             raise TimePeriodError("starttime has to be a datetime object")
 
         if starttime.tzinfo is None or starttime.tzinfo.utcoffset(starttime) is None:
-            raise TimePeriodError(
-                "starttime has to be a TZ aware datetime object")
+            raise TimePeriodError("starttime has to be a TZ aware datetime object")
 
         # UTC will be used internally to simplify date and time
         # arithmetic and avoid common problems with DST boundaries.
@@ -69,20 +67,18 @@ class TimePeriod(object):
 
         self._starttime = starttime
 
-
     @property
     def endtime(self):
-        """Getter for endtime
+        """Getter for endtime.
 
         :return: The absolute end time of the period in UTC
         :rtype: datetime.datetime
         """
         return self._endtime
 
-
     @endtime.setter
     def endtime(self, endtime):
-        """Setter for endtime which checks for a TZ aware datetime object
+        """Setter for endtime which checks for a TZ aware datetime object.
 
         The setter also updates the period's duration if a starttime was
         already set.
@@ -95,8 +91,7 @@ class TimePeriod(object):
             raise TimePeriodError("endtime has to be a datetime object")
 
         if endtime.tzinfo is None or endtime.tzinfo.utcoffset(endtime) is None:
-            raise TimePeriodError(
-                "endtime has to be a TZ aware datetime object")
+            raise TimePeriodError("endtime has to be a TZ aware datetime object")
 
         # UTC will be used internally to simplify date and time
         # arithmetic and avoid common problems with DST boundaries.
@@ -112,10 +107,9 @@ class TimePeriod(object):
 
         self._endtime = endtime
 
-
     @property
     def duration(self):
-        """Getter for duration
+        """Getter for duration.
 
         Returns the duration of a period as a :class:`datetime.timedelta`
         object.
@@ -127,10 +121,9 @@ class TimePeriod(object):
         """
         return self._duration
 
-
     @duration.setter
     def duration(self, duration):
-        """Setter for duration
+        """Set duration.
 
         Sets the duration of the period and calculates the start or end time if
         either one of it is defined. Note, that it is not allowed to set the
@@ -144,14 +137,14 @@ class TimePeriod(object):
         """
 
         if not isinstance(duration, datetime.timedelta):
-            raise TimePeriodError('duration has to be a timedelta object')
+            raise TimePeriodError("duration has to be a timedelta object")
 
         if duration < datetime.timedelta(0):
-            raise TimePeriodError('duration must be positive')
+            raise TimePeriodError("duration must be positive")
 
         # Prevent the start or end time from being changed once they are set
         if self.starttime is not None and self.endtime is not None:
-            raise TimePeriodError('duration already defined')
+            raise TimePeriodError("duration already defined")
 
         # Automatically set a missing start or end time
         if self.endtime is None and self.starttime is not None:
@@ -161,9 +154,8 @@ class TimePeriod(object):
 
         self._duration = duration
 
-
     def set_length(self, seconds=0.0):
-        """Sets the length of a period in seconds
+        """Set the length of a period in seconds.
 
         Sets the period's length in seconds, this is a helper wrapper around
         :meth:`TimePeriod.duration()`.
@@ -173,29 +165,30 @@ class TimePeriod(object):
 
         self.duration = datetime.timedelta(seconds=seconds)
 
-
     def started(self):
-        """Checks if the period has started
+        """Check if the period has started.
 
         :return: ``True`` if the period has started, otherwise ``False``
         :rtype: bool
         """
-        return bool(self._starttime is not None and \
-                    datetime.datetime.now(pytz.utc) >= self._starttime)
-
+        return bool(
+            self._starttime is not None
+            and datetime.datetime.now(pytz.utc) >= self._starttime
+        )
 
     def ended(self):
-        """Checks if the period has ended
+        """Check if the period has ended.
 
         :return: ``True`` if the period has ended, otherwise ``False``
         :rtype: bool
         """
-        return bool(self._endtime is not None and \
-                    datetime.datetime.now(pytz.utc) >= self._endtime)
-
+        return bool(
+            self._endtime is not None
+            and datetime.datetime.now(pytz.utc) >= self._endtime
+        )
 
     def active(self):
-        """Checks if the period is active
+        """Check if the period is active.
 
         An active period is defined as one that has started but not ended yet.
 
@@ -204,12 +197,12 @@ class TimePeriod(object):
         """
         return bool(self.started() and not self.ended())
 
-
     def __str__(self):
-        """Returns a string representation of the period, useful for logging
+        """Return a string representation of the period, useful for logging.
 
         :return: String containing the start time, end time and duration
         :rtype: str
         """
-        return '{1} start: {2}, end: {3}, duration: {4}'.format(
-            __name__, self.starttime, self.endtime, self.duration)
+        return "{0} start: {1}, end: {2}, duration: {3}".format(
+            __name__, self.starttime, self.endtime, self.duration
+        )
