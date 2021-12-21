@@ -12,4 +12,4 @@ mock==4.0.3
 pytest==6.2.5
 pytest-cov==3.0.0
 pytest-env==0.6.2
-pytest-pylint==0.14.0
+pytest-pylint==0.18.0
