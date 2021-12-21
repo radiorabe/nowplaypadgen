@@ -4,8 +4,9 @@ import os
 import sys
 import unittest
 
-from nowplaypadgen import timeperiod  # pylint: disable=wrong-import-position
-from nowplaypadgen import track  # pylint: disable=wrong-import-position
+import mock
+
+from nowplaypadgen import timeperiod, track
 
 # Load the module locally from the dev environment.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -40,6 +41,25 @@ class TrackTestSuite(unittest.TestCase):
         )
 
         self.assertEqual(expected_string, str(self.my_track))
+
+    @mock.patch("mutagen.File")
+    def test_track_from_file(self, mock_mutagen_file):
+        """Test the track creation from a file."""
+
+        # mock getting artist and title from the file
+        mock_mutagen_file.return_value.get.return_value = (self.track_title,)
+        # mock audio_file.info.length
+        mock_mutagen_file.return_value.info.length = 123
+        # mock getting items from the file
+        mock_mutagen_file.return_value.items.return_value = [
+            ("artist", "artist"),
+            ("title", ["title 1, title 2"]),
+        ]
+
+        my_track = track.Track.from_file("/path/to/my/track.mp3")
+
+        mock_mutagen_file.assert_called_once_with("/path/to/my/track.mp3")
+        self.assertEqual("My Track Title", my_track.title)
 
 
 if __name__ == "__main__":

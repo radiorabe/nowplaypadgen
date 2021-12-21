@@ -240,6 +240,37 @@ class DLPlusTagTestSuite(unittest.TestCase):
 
         self.assertEqual(expected_msg, str(context_manager.exception))
 
+    def test_from_message_invalid_message(self):
+        """Test the creation of a DLPlusTag object from an invalid message."""
+
+        with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
+            dlplus.DLPlusTag.from_message(None, "ITEM.TITLE")
+
+        expected_msg = "dlp_message has to be a DLPlusMessage"
+        self.assertEqual(expected_msg, str(context_manager.exception))
+
+    def test_from_message_invalid_content_type(self):
+        """Test the creation of a DLPlusTag object from an invalid content type."""
+
+        with self.assertRaises(dlplus.DLPlusContentTypeError) as context_manager:
+            dlplus.DLPlusTag.from_message(dlplus.DLPlusMessage(), "HAHA.LOLWAT")
+
+        expected_msg = "Invalid content_type: HAHA.LOLWAT"
+        self.assertEqual(expected_msg, str(context_manager.exception))
+
+    def test_from_message_missing_content_type(self):
+        """Test the creation of a DLPlusTag object with a missing content type."""
+
+        with self.assertRaises(dlplus.DLPlusTagError) as context_manager:
+            message = dlplus.DLPlusMessage()
+            message.add_dlp_object(
+                dlplus.DLPlusObject("STATIONNAME.LONG", "Radio RaBe")
+            )
+            dlplus.DLPlusTag.from_message(message, "ITEM.TITLE")
+
+        expected_msg = "No DLPlusObject for content type ITEM.TITLE available"
+        self.assertEqual(expected_msg, str(context_manager.exception))
+
 
 class DLPlusMessageTestSuite(unittest.TestCase):
     """DLPlusMessage test cases."""
@@ -438,6 +469,20 @@ class DLPlusMessageTestSuite(unittest.TestCase):
         self.assertTrue("ITEM.TITLE" in dlp_tags)
         self.assertEqual(dlp_tags["ITEM.TITLE"].start, self.title_start)
         self.assertEqual(dlp_tags["ITEM.TITLE"].length, self.title_length)
+
+    def test_build_message_over_maximum_limit(self):
+        """Test the building of a DL Plus message over the maximum limit."""
+
+        self.dlp_msg.add_dlp_object(self.dlp_title_obj)
+        self.dlp_msg.add_dlp_object(self.dlp_artist_obj)
+
+        format_string = "".join("A" for _ in range(129))
+
+        with self.assertRaises(dlplus.DLPlusMessageError) as context_manager:
+            self.dlp_msg.build(format_string)
+
+        expected_msg = "Message is longer than 128 bytes"
+        self.assertEqual(expected_msg, str(context_manager.exception))
 
 
 if __name__ == "__main__":

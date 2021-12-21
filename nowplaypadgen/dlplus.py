@@ -383,7 +383,34 @@ class DLPlusObjectError(DLPlusError):
 class DLPlusMessage(object):
     """Dynamic Label Plus (DL Plus) message.
 
-    This class supports parsing or building a DL Plus message string
+    This class supports parsing or building a DL Plus message string.
+
+    If it is not initialised, it will render an empty message.
+
+    >>> message = DLPlusMessage()
+    >>> str(message)
+    ''
+
+    You can add a :class:`DLPlusObject` to the message.
+
+    >>> message.add_dlp_object(DLPlusObject("ITEM.TITLE", "Title"))
+
+    Render it using the :meth:`build` method.
+
+    >>> message.build("{o[ITEM.TITLE]}")
+    >>> str(message)
+    'Title'
+
+    Fetch the raw DL Plus message string.
+
+    >>> message.message
+    'Title'
+
+    Get the detected :class:`DLPlusTag`: instances (if any).
+
+    >>> tags = message.get_dlp_tags()
+    >>> type(tags['ITEM.TITLE'])
+    <class 'nowplaypadgen.dlplus.DLPlusTag'>
     """
 
     def __init__(self):
@@ -458,6 +485,22 @@ class DLPlusMessage(object):
         After adding all DL Plus tags, :meth:`DLPlusMessage.parse()` has to be
         called.
 
+        >>> message = DLPlusMessage()
+        >>> message.add_dlp_tag(DLPlusTag("ITEM.TITLE", 0, 10))
+
+        You can add up to 4 tags.
+
+        >>> message = DLPlusMessage()
+        >>> message.add_dlp_tag(DLPlusTag("ITEM.TITLE", 0, 10))
+        >>> message.add_dlp_tag(DLPlusTag("ITEM.ARTIST", 0, 10))
+        >>> message.add_dlp_tag(DLPlusTag("ITEM.ALBUM", 0, 10))
+        >>> message.add_dlp_tag(DLPlusTag("INFO.URL", 0, 10))
+        >>> try:
+        ...     message.add_dlp_tag(DLPlusTag("INFO.OTHER", 0, 10))
+        ... except DLPlusMessageError as ex:
+        ...     print(ex)
+        Only a maximum of 4 DLPlusTag objects can be added
+
         :param DLPlusTag dlp_tag: The DL Plus Tag object to add
         :raises DLPlusMessageError: when `dlp_tag` is not a
                                     :class:`DLPlusTag` object, or the maximum
@@ -497,6 +540,22 @@ class DLPlusMessage(object):
         :meth:`DLPlusMessage.add_dlp_tag()` method.  Afterwards the newly
         created DL Plus objects (:class:`DLPlusObject`) can be retrieved via
         the :meth:`DLPlusMessage.get_dlp_objects()` method.
+
+        >>> message = DLPlusMessage()
+        >>> message.add_dlp_tag(DLPlusTag("STATIONNAME.LONG", 0, 10))
+        >>> message.add_dlp_tag(DLPlusTag("STATIONNAME.SHORT", 6, 4))
+        >>> message.parse("Radio RaBe")
+        >>> objs = message.get_dlp_objects()
+        >>> str(objs['STATIONNAME.LONG'])
+        'Radio RaBe'
+        >>> str(objs['STATIONNAME.SHORT'])
+        'RaBe'
+
+        If will not fail if the message is not formatted according to the DL Plus Tag
+
+        >>> message = DLPlusMessage()
+        >>> message.add_dlp_tag(DLPlusTag("STATIONNAME.LONG", 0, 10))
+        >>> message.parse("RaBe")
 
         :param str message: The DL Plus message string which should be parsed
         """
@@ -543,10 +602,28 @@ class DLPlusMessage(object):
         will be created.
 
         Before calling this method, one is supposed to add up to four DL Plus
-        objects (:class:`DLPlusObject`) via the
-        :meth:`DLPlusMessage.add_dlp_object()` method. Afterwards the newly
-        created DL Plus tags (:class:`DLPlusTag`) can be retrieved via the
-        :meth:`DLPlusMessage.get_dlp_tags()` method.
+        objects (:class:`DLPlusObject`) via the :meth:`DLPlusMessage.add_dlp_object()`
+        method.
+
+        >>> message = DLPlusMessage()
+        >>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio RaBe"))
+        >>> message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
+
+        You can then use the :meth:`DLPlusMessage.build()` method to build the
+        DL Plus message string and create the DL Plus tags (:class:`DLPlusTag`).
+
+        >>> message.build("{o[STATIONNAME.LONG]}")
+        >>> message.message
+        'Radio RaBe'
+
+        Afterwards the newly created DL Plus tags (:class:`DLPlusTag`) can be
+        retrieved via the :meth:`DLPlusMessage.get_dlp_tags()` method.
+
+        >>> tags = message.get_dlp_tags()
+        >>> f"{tags['STATIONNAME.LONG']} {tags['STATIONNAME.LONG'].start} {tags['STATIONNAME.LONG'].length}"
+        'STATIONNAME.LONG 0 10'
+        >>> f"{tags['STATIONNAME.SHORT']} {tags['STATIONNAME.SHORT'].start} {tags['STATIONNAME.SHORT'].length}"
+        'STATIONNAME.SHORT 6 4'
 
         :param str format_string: The DL Plus message string format with content
                                   type replacement patterns in curly braces
@@ -760,6 +837,17 @@ class DLPlusTag(DLPlusContentType):
 
     DL plus tag which defines a start and length marker together with a content
     type.
+
+    >>> tag = DLPlusTag(content_type="ITEM.TITLE", start=0, length=10)
+    >>> print(tag)
+    ITEM.TITLE
+
+    The tag contains a start and length marker
+
+    >>> tag.start
+    0
+    >>> tag.length
+    10
     """
 
     def __init__(self, content_type, start, length):
@@ -811,6 +899,14 @@ class DLPlusTag(DLPlusContentType):
         The factory creates a new :class:`DLPlusTag` object from an existing
         and already populated :class:`DLPlusMessage` object, this way one
         doesn't has to calculate and specify the `start` and `length` markers.
+
+        >>> message = DLPlusMessage()
+        >>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio RaBe"))
+        >>> message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
+        >>> message.build("{o[STATIONNAME.LONG]}")
+        >>> tag = DLPlusTag.from_message(message, "STATIONNAME.SHORT")
+        >>> f"{tag.content_type} {tag.start} {tag.length}"
+        'STATIONNAME.SHORT 6 4'
 
         :param DLPlusMessage dlp_message: The populated DL Plus message
         :return: DL Plus Tag

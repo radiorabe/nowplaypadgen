@@ -26,6 +26,8 @@ class Show(timeperiod.TimePeriod):
 
     >>> sh.description = "My weekly show about Python coding"
     >>> sh.url = 'http://pyshow.example.com'
+    >>> sh.url
+    'http://pyshow.example.com'
 
     In this example we set our hour long show to have finished an hour ago.
 
@@ -62,6 +64,10 @@ class Show(timeperiod.TimePeriod):
 
     def __str__(self):
         """Return a string representation of the show, useful for logging.
+
+        >>> show = Show('My Show', uid="12345678-1234-1234-1234-123456789012")
+        >>> str(show)
+        "Show 'My Show' (12345678-1234-1234-1234-123456789012) start: None, end: None, url: None"
 
         :return: String containing the show's name, start time,
                  end time and URL.

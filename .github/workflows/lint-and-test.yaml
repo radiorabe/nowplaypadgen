@@ -33,4 +33,4 @@ jobs:
 
       - run: pip install -r requirements-dev.txt
 
-      - run: pytest
+      - run: pytest --cov=nowplaypadgen --cov-fail-under=100
