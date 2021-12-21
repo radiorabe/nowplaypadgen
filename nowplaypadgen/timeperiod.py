@@ -200,6 +200,12 @@ class TimePeriod(object):
     def __str__(self):
         """Return a string representation of the period, useful for logging.
 
+        >>> p = TimePeriod()
+        >>> p.starttime = datetime.datetime(2013, 1, 1, 13, 12, 0, tzinfo=pytz.utc)
+        >>> p.endtime = datetime.datetime(2113, 1, 1, 13, 12, 0, tzinfo=pytz.utc)
+        >>> print(p)
+        nowplaypadgen.timeperiod start: 2013-01-01 13:12:00+00:00, end: 2113-01-01 13:12:00+00:00, duration: 36524 days, 0:00:00
+
         :return: String containing the start time, end time and duration
         :rtype: str
         """

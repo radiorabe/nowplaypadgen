@@ -8,7 +8,7 @@ import sys
 import nowplaypadgen
 
 
-def parse_arguments():
+def parse_arguments():  # pragma: no cover
     """Parse arguments passed by user."""
     parser = argparse.ArgumentParser(description=nowplaypadgen.__doc__)
 
@@ -41,7 +41,7 @@ def parse_arguments():
     parser.parse_args()
 
 
-def setup_logging():
+def setup_logging():  # pragma: no cover
     """Prepare logger."""
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
@@ -58,12 +58,12 @@ def setup_logging():
     return logger
 
 
-def main():
+def main():  # pragma: no cover
     """Application entrypoint."""
     logger = setup_logging()
     parse_arguments()
     logger.info("hello world")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
