@@ -380,7 +380,7 @@ class DLPlusObjectError(DLPlusError):
     """DL Plus object related exceptions."""
 
 
-class DLPlusMessage(object):
+class DLPlusMessage:
     """Dynamic Label Plus (DL Plus) message.
 
     This class supports parsing or building a DL Plus message string.
@@ -422,19 +422,14 @@ class DLPlusMessage(object):
 
         #: The format string from which the message will be built
         self.format_string = ""
-
         #: The formatted DL Plus message
         self._message = ""
-
         #: Dictionary holding the assigned DL Plus objects
         self._dlp_objects = {}
-
         #: Dictionary holding the assigned DL Plus tags
         self._dlp_tags = {}
-
         #: Status if the message was successfully parsed
         self._parsed = False
-
         #: Status if the message was successfully built
         self._built = False
 
@@ -565,8 +560,7 @@ class DLPlusMessage(object):
 
         # Extract sub strings from the message according to the DLPlusTag
         # objects to create DLPLusObject objects
-        for content_type in self._dlp_tags:
-            dlp_tag = self._dlp_tags[content_type]
+        for _, dlp_tag in self._dlp_tags.items():
             end = dlp_tag.start + dlp_tag.length
 
             # Delete objects have their length marker set to 0 and the start
@@ -620,9 +614,11 @@ class DLPlusMessage(object):
         retrieved via the :meth:`DLPlusMessage.get_dlp_tags()` method.
 
         >>> tags = message.get_dlp_tags()
-        >>> f"{tags['STATIONNAME.LONG']} {tags['STATIONNAME.LONG'].start} {tags['STATIONNAME.LONG'].length}"
+        >>> long = tags['STATIONNAME.LONG']
+        >>> f"{long} {long.start} {long.length}"
         'STATIONNAME.LONG 0 10'
-        >>> f"{tags['STATIONNAME.SHORT']} {tags['STATIONNAME.SHORT'].start} {tags['STATIONNAME.SHORT'].length}"
+        >>> short = tags['STATIONNAME.SHORT']
+        >>> f"{short} {short.start} {short.length}"
         'STATIONNAME.SHORT 6 4'
 
         :param str format_string: The DL Plus message string format with content
@@ -653,8 +649,7 @@ class DLPlusMessage(object):
         self._dlp_tags = {}
 
         # Create DLPlusTags from the message and DLPlusObjects
-        for content_type in self._dlp_objects:
-            dlp_object = self._dlp_objects[content_type]
+        for _, dlp_object in self._dlp_objects.items():
             self._dlp_tags[dlp_object.content_type] = DLPlusTag.from_message(
                 self, dlp_object.content_type
             )
@@ -680,7 +675,7 @@ class DLPlusMessage(object):
         return self.message
 
 
-class DLPlusContentType(object):
+class DLPlusContentType:
     """Dynamic Label Plus content type."""
 
     def __init__(self, content_type):
@@ -776,7 +771,7 @@ class DLPlusObject(DLPlusContentType):
         """
 
         # Call the parent constructor which will assign self.content_type
-        super(DLPlusObject, self).__init__(content_type)
+        super().__init__(content_type)
 
         # Make sure that the byte length of the text doesn't exceed the maximum
         # allowed limit.
@@ -874,7 +869,7 @@ class DLPlusTag(DLPlusContentType):
         """
 
         # Call the parent constructor which will assign self.content_type
-        super(DLPlusTag, self).__init__(content_type)
+        super().__init__(content_type)
 
         if not isinstance(start, int) or start < 0:
             raise DLPlusTagError("start must be a positive integer")
@@ -927,10 +922,10 @@ class DLPlusTag(DLPlusContentType):
         # was added and is available.
         try:
             dlp_object = dlp_message.get_dlp_objects()[content_type]
-        except KeyError:
+        except KeyError as key_error:
             raise DLPlusTagError(
                 f"No DLPlusObject for content type {content_type} available"
-            )
+            ) from key_error
 
         # Get the start marker (index) of the DL Plus object's text
         start = dlp_message.message.find(dlp_object.text)

@@ -8,10 +8,8 @@ import pytz
 class TimePeriodError(Exception):
     """TimePeriod related exception."""
 
-    pass
 
-
-class TimePeriod(object):
+class TimePeriod:
     """TimePeriod class which represents a period in time.
 
     A TimePeriod can have an absolute start and end date/time, a duration,
@@ -200,6 +198,7 @@ class TimePeriod(object):
     def __str__(self):
         """Return a string representation of the period, useful for logging.
 
+        >>> # pylint: disable=line-too-long
         >>> p = TimePeriod()
         >>> p.starttime = datetime.datetime(2013, 1, 1, 13, 12, 0, tzinfo=pytz.utc)
         >>> p.endtime = datetime.datetime(2113, 1, 1, 13, 12, 0, tzinfo=pytz.utc)
@@ -209,6 +208,6 @@ class TimePeriod(object):
         :return: String containing the start time, end time and duration
         :rtype: str
         """
-        return "{0} start: {1}, end: {2}, duration: {3}".format(
-            __name__, self.starttime, self.endtime, self.duration
-        )
+
+        # pylint: disable=line-too-long
+        return f"{__name__} start: {self.starttime}, end: {self.endtime}, duration: {self.duration}"

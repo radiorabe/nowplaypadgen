@@ -1,245 +1,240 @@
-"""TimePeriod related unit tests."""
+"""Test :class:`TimePeriod`."""
 
 import datetime
-import os
-import sys
-import unittest
 
+import pytest
 import pytz
 
-from nowplaypadgen import timeperiod  # pylint: disable=wrong-import-position
+from nowplaypadgen.timeperiod import TimePeriod, TimePeriodError
 
-# Load the module locally from the dev environment.
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+@pytest.fixture(name="period")
+def fixture_period():
+    """Return TimePeriod fixture."""
+    return TimePeriod()
 
-class TimePeriodTestSuite(unittest.TestCase):
-    """TimePeriod test cases."""
 
-    def setUp(self):
-        self.period = timeperiod.TimePeriod()
+def test_date_assignment(period):
+    """Test the time setter and getter decorators."""
 
-    def test_date_assignment(self):
-        """Test the time setter and getter decorators."""
+    period.starttime = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
+    assert isinstance(period.starttime, datetime.datetime)
 
-        self.period.starttime = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
+    period.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
+    assert isinstance(period.endtime, datetime.datetime)
 
-        self.assertIsInstance(self.period.starttime, datetime.datetime)
 
-        self.period.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
+def test_date_must_be_datetime_obj(period):
+    """Test if none datetime objects will be refused."""
 
-        self.assertIsInstance(self.period.endtime, datetime.datetime)
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.starttime = "Not a datetime.datetime object"
 
-    def test_date_must_be_datetime_obj(self):
-        """Test if none datetime objects will be refused."""
+    assert "starttime has to be a datetime object" in str(time_period_error)
 
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.starttime = "Not a datetime.datetime object"
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.endtime = "Not a datetime.datetime object"
 
-        self.assertEqual(
-            "starttime has to be a datetime object", str(context_manager.exception)
-        )
+    assert "endtime has to be a datetime object" in str(time_period_error)
 
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.endtime = "Not a datetime.datetime object"
 
-        self.assertEqual(
-            "endtime has to be a datetime object", str(context_manager.exception)
-        )
+def test_date_must_be_tz_aware(period):
+    """Test if none TZ aware datetime objects will be refused."""
 
-    def test_date_must_be_tz_aware(self):
-        """Test if none TZ aware datetime objects will be refused."""
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.starttime = datetime.datetime(2017, 8, 30, 21, 0, 0, 0)
 
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.starttime = datetime.datetime(2017, 8, 30, 21, 0, 0, 0)
+    assert "starttime has to be a TZ aware datetime object" in str(time_period_error)
 
-        self.assertEqual(
-            "starttime has to be a TZ aware datetime object",
-            str(context_manager.exception),
-        )
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0)
 
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0)
+    assert "endtime has to be a TZ aware datetime object" in str(time_period_error)
 
-        self.assertEqual(
-            "endtime has to be a TZ aware datetime object",
-            str(context_manager.exception),
-        )
 
-    def test_start_date_utc_conversion(self):
-        """Test if datetime objects will be converted to UTC."""
+def test_start_date_utc_conversion(period):
+    """Test if datetime objects will be converted to UTC."""
 
-        # Create localized start and end times
-        zone_name = "Europe/Zurich"
-        zurich_tz = pytz.timezone(zone_name)
-        start = zurich_tz.localize(datetime.datetime(2017, 8, 30, 21, 0, 0, 0))
-        end = zurich_tz.localize(datetime.datetime(2017, 8, 30, 22, 0, 0, 0))
-        self.assertEqual(zone_name, start.tzinfo.zone)
-        self.assertEqual(zone_name, end.tzinfo.zone)
+    # Create localized start and end times
+    zone_name = "Europe/Zurich"
+    zurich_tz = pytz.timezone(zone_name)
+    start = zurich_tz.localize(datetime.datetime(2017, 8, 30, 21, 0, 0, 0))
+    end = zurich_tz.localize(datetime.datetime(2017, 8, 30, 22, 0, 0, 0))
+    assert zone_name == start.tzinfo.zone
+    assert zone_name == end.tzinfo.zone
 
-        self.period.starttime = start
-        self.period.endtime = end
+    period.starttime = start
+    period.endtime = end
 
-        # Start and end times must be converted to UTC internally
-        self.assertEqual("UTC", self.period.starttime.tzinfo.zone)
-        self.assertEqual("UTC", self.period.endtime.tzinfo.zone)
+    # Start and end times must be converted to UTC internally
+    assert period.starttime.tzinfo.zone == "UTC"
+    assert period.endtime.tzinfo.zone == "UTC"
 
-    def test_end_not_before_start_date(self):
-        """Test that an end date can't be before a start date."""
 
-        start = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
-        end = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
+def test_end_not_before_start_date(period):
+    """Test that an end date can't be before a start date."""
 
-        self.period.starttime = start
+    start = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
+    end = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
 
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.endtime = end
+    period.starttime = start
 
-        error = "endtime {0} has to be > than starttime {1}".format(end, start)
-        self.assertEqual(error, str(context_manager.exception))
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.endtime = end
 
-    def test_start_after_end_date(self):
-        """Test that a start date can't be after and end date."""
+    expected_error = f"endtime {end} has to be > than starttime {start}"
+    assert expected_error in str(time_period_error)
 
-        start = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
-        end = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
 
-        self.period.endtime = end
+def test_start_after_end_date(period):
+    """Test that a start date can't be after and end date."""
 
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.starttime = start
+    start = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
+    end = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
 
-        error = "starttime {0} has to be < than endtime {1}".format(start, end)
-        self.assertEqual(error, str(context_manager.exception))
+    period.endtime = end
 
-    def test_period_has_started(self):
-        """Test that a period has started."""
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.starttime = start
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    expected_error = f"starttime {start} has to be < than endtime {end}"
+    assert expected_error in str(time_period_error)
 
-        self.period.starttime = now
-        self.period.endtime = now + datetime.timedelta(hours=1)  # plus one hour
 
-        self.assertTrue(self.period.active())
-        self.assertTrue(self.period.started())
-        self.assertFalse(self.period.ended())
+def test_period_has_started(period):
+    """Test that a period has started."""
 
-    def test_period_has_not_started(self):
-        """Test that a period hasn't started yet."""
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    period.starttime = now
+    period.endtime = now + datetime.timedelta(hours=1)  # plus one hour
 
-        self.period.starttime = now + datetime.timedelta(hours=1)  # plus one hour
-        self.period.endtime = now + datetime.timedelta(hours=2)  # plus two hours
-        self.assertFalse(self.period.active())
-        self.assertFalse(self.period.started())
-        self.assertFalse(self.period.ended())
+    assert period.active()
+    assert period.started()
+    assert not period.ended()
 
-    def test_period_has_ended(self):
-        """Test that a period has ended."""
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+def test_period_has_not_started(period):
+    """Test that a period hasn't started yet."""
 
-        self.period.starttime = now - datetime.timedelta(hours=2)  # minus two hours
-        self.period.endtime = now - datetime.timedelta(hours=1)  # minus one hour
-        self.assertFalse(self.period.active())
-        self.assertTrue(self.period.started())
-        self.assertTrue(self.period.ended())
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-    def test_period_has_not_ended(self):
-        """Test that a period hasn't ended yet."""
+    period.starttime = now + datetime.timedelta(hours=1)  # plus one hour
+    period.endtime = now + datetime.timedelta(hours=2)  # plus two hours
+    assert not period.active()
+    assert not period.started()
+    assert not period.ended()
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-        self.period.starttime = now
-        self.period.endtime = now + datetime.timedelta(hours=1)  # plus one hour
-        self.assertTrue(self.period.active())
-        self.assertTrue(self.period.started())
-        self.assertFalse(self.period.ended())
+def test_period_has_ended(period):
+    """Test that a period has ended."""
 
-    def test_get_period_duration(self):
-        """Test get duration (time delta) of a period."""
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    period.starttime = now - datetime.timedelta(hours=2)  # minus two hours
+    period.endtime = now - datetime.timedelta(hours=1)  # minus one hour
+    assert not period.active()
+    assert period.started()
+    assert period.ended()
 
-        # The period spans one hour
-        self.period.starttime = now
-        self.period.endtime = now + datetime.timedelta(hours=1)
 
-        expected_delta = datetime.timedelta(0, 3600)
+def test_period_has_not_ended(period):
+    """Test that a period hasn't ended yet."""
 
-        self.assertEqual(self.period.duration, expected_delta)
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-    def test_set_period_duration(self):
-        """Test set duration (time delta) of a period."""
+    period.starttime = now
+    period.endtime = now + datetime.timedelta(hours=1)  # plus one hour
+    assert period.active()
+    assert period.started()
+    assert not period.ended()
 
-        duration = datetime.timedelta(hours=1)
-        self.period.duration = duration
 
-        self.assertEqual(self.period.duration, duration)
+def test_get_period_duration(period):
+    """Test get duration (time delta) of a period."""
 
-    def test_duration_must_be_timedelta(self):
-        """Test if none timedelta period objects will be refused."""
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.duration = "Not a datetime.timedelta object"
+    # The period spans one hour
+    period.starttime = now
+    period.endtime = now + datetime.timedelta(hours=1)
 
-        self.assertEqual(
-            "duration has to be a timedelta object", str(context_manager.exception)
-        )
+    expected_delta = datetime.timedelta(0, 3600)
 
-    def test_duration_must_be_positive(self):
-        """Test that only positive durations will be accepted."""
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.duration = datetime.timedelta(seconds=-1)
+    assert period.duration == expected_delta
 
-        self.assertEqual("duration must be positive", str(context_manager.exception))
 
-    def test_duration_already_defined(self):
-        """Test that a duration can't be changed."""
+def test_set_period_duration(period):
+    """Test set duration (time delta) of a period."""
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    duration = datetime.timedelta(hours=1)
+    period.duration = duration
 
-        # This should automatically set the duration, as a start and end time is
-        # known by the period
-        self.period.starttime = now
-        self.period.endtime = now + datetime.timedelta(hours=1)
+    assert period.duration == duration
 
-        with self.assertRaises(timeperiod.TimePeriodError) as context_manager:
-            self.period.duration = datetime.timedelta(hours=2)
 
-        self.assertEqual("duration already defined", str(context_manager.exception))
+def test_duration_must_be_timedelta(period):
+    """Test if none timedelta period objects will be refused."""
 
-    def test_duration_sets_endtime(self):
-        """Test that a duration will set a currently unknown end time."""
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.duration = "Not a datetime.timedelta object"
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        duration = datetime.timedelta(hours=1)
+    assert "duration has to be a timedelta object" in str(time_period_error)
 
-        self.period.starttime = now
-        self.period.duration = duration
 
-        self.assertEqual(self.period.endtime, now + duration)
+def test_duration_must_be_positive(period):
+    """Test that only positive durations will be accepted."""
 
-    def test_duration_sets_starttime(self):
-        """Test that a duration will set a currently unknown start time."""
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.duration = datetime.timedelta(seconds=-1)
 
-        now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-        duration = datetime.timedelta(hours=1)
+    assert "duration must be positive" in str(time_period_error)
 
-        self.period.endtime = now
-        self.period.duration = duration
 
-        self.assertEqual(self.period.starttime, now - duration)
+def test_duration_already_defined(period):
+    """Test that a duration can't be changed."""
 
-    def test_set_length(self):
-        """Test that the duration can be set using seconds."""
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-        duration = datetime.timedelta(hours=1)
-        self.period.set_length(3600)
+    # This should automatically set the duration, as a start and end time is
+    # known by the period
+    period.starttime = now
+    period.endtime = now + datetime.timedelta(hours=1)
 
-        self.assertEqual(self.period.duration, duration)
+    with pytest.raises(TimePeriodError) as time_period_error:
+        period.duration = datetime.timedelta(hours=2)
 
+    assert "duration already defined" in str(time_period_error)
 
-if __name__ == "__main__":
-    unittest.main()
+
+def test_duration_sets_endtime(period):
+    """Test that a duration will set a currently unknown end time."""
+
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    duration = datetime.timedelta(hours=1)
+
+    period.starttime = now
+    period.duration = duration
+
+    assert period.endtime == now + duration
+
+
+def test_duration_sets_starttime(period):
+    """Test that a duration will set a currently unknown start time."""
+
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    duration = datetime.timedelta(hours=1)
+
+    period.endtime = now
+    period.duration = duration
+
+    assert period.starttime == now - duration
+
+
+def test_set_length(period):
+    """Test that the duration can be set using seconds."""
+
+    duration = datetime.timedelta(hours=1)
+    period.set_length(3600)
+
+    assert period.duration == duration
