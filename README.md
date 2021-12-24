@@ -13,5 +13,5 @@ pip install -r requirements-dev.txt
 ### Run Tests
 
 ```bash
-pytest
+pytest --pylint tests
 ```

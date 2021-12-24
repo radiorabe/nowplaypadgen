@@ -10,8 +10,6 @@ from nowplaypadgen import timeperiod
 class TrackError(Exception):
     """Track related exception."""
 
-    pass
-
 
 class Track(timeperiod.TimePeriod):
     """Track class which represents an audio track.
@@ -36,11 +34,9 @@ class Track(timeperiod.TimePeriod):
         self.artist = artist  #: The track's artist
         self.title = title  #: The track's title
         self.uid = uid  #: The track's global unique identifier (UUID)
-
         self.tags = {}  #: Optional meta tag dictionary of a track
-
         # Call the parent's constructor
-        super(Track, self).__init__()
+        super().__init__()
 
     @classmethod
     def from_file(cls, track_path):
@@ -96,4 +92,4 @@ class Track(timeperiod.TimePeriod):
         :return: String containing the track's artist and title
         :rtype: str
         """
-        return "Track: {0} - {1} ({2})".format(self.artist, self.title, self.uid)
+        return f"Track: {self.artist} - {self.title} ({self.uid})"

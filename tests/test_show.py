@@ -1,29 +1,32 @@
-"""Show related unit tests."""
+"""Test :class:`Show`."""
 
-import unittest
+import pytest
 
-from nowplaypadgen import show, timeperiod
-
-
-class ShowTestSuite(unittest.TestCase):
-    """Show test cases."""
-
-    def setUp(self):
-        self.show_name = "My Show Name"
-        self.my_show = show.Show(self.show_name)
-
-    def test_show_supports_timeperiod(self):
-        """Test that the show is an instance of timeperiod.TimePeriod."""
-
-        # Test that the show inherits TimePeriod, otherwise the show lacks
-        # the start and end time/date methods.
-        self.assertTrue(isinstance(self.my_show, timeperiod.TimePeriod))
-
-    def test_show_name_assignment(self):
-        """Test the show name assignment."""
-
-        self.assertEqual(self.show_name, self.my_show.name)
+from nowplaypadgen.show import Show
+from nowplaypadgen.timeperiod import TimePeriod
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.fixture(name="show_name")
+def fixture_show_name():
+    """Show name fixture."""
+    return "My Show Name"
+
+
+@pytest.fixture(name="show")
+def fixture_show(show_name):
+    """Show fixture."""
+    return Show(show_name)
+
+
+def test_show_supports_timeperiod(show):
+    """Test that the show is an instance of timeperiod.TimePeriod."""
+
+    # Test that the show inherits TimePeriod, otherwise the show lacks
+    # the start and end time/date methods.
+    assert isinstance(show, TimePeriod)
+
+
+def test_show_name_assignment(show, show_name):
+    """Test the show name assignment."""
+
+    assert show_name == show.name

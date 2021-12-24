@@ -8,8 +8,6 @@ from nowplaypadgen import timeperiod
 class ShowError(Exception):
     """Show related exception."""
 
-    pass
-
 
 class Show(timeperiod.TimePeriod):
     """Show class which represents a specific broadcast show.
@@ -60,7 +58,7 @@ class Show(timeperiod.TimePeriod):
         self.description = None  #: The show's description
         self.url = None  #: The show's URL
         # Call the parent's constructor
-        super(Show, self).__init__()
+        super().__init__()
 
     def __str__(self):
         """Return a string representation of the show, useful for logging.
@@ -73,4 +71,5 @@ class Show(timeperiod.TimePeriod):
                  end time and URL.
         :rtype: str
         """
+        # pylint: disable=line-too-long
         return f"Show '{self.name}' ({self.uid}) start: {self.starttime}, end: {self.endtime}, url: {self.url}"
