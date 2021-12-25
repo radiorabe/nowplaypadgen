@@ -700,6 +700,8 @@ class DLPlusContentType:
 
         #: The content type according to ETSI TS 102 980, Annex A, Table A.1
         self.content_type = content_type
+        #: Store content_type info for later lookups
+        self._content_type = CONTENT_TYPES[content_type]
 
     def get_code(self):
         """Get the content type code.
@@ -711,7 +713,7 @@ class DLPlusContentType:
         :rtype: int
         """
 
-        return CONTENT_TYPES[self.content_type]["code"]
+        return self._content_type["code"]
 
     def get_category(self):
         """Get the content type category.
@@ -722,7 +724,7 @@ class DLPlusContentType:
         :return: category string
         :rtype: str
         """
-        return CONTENT_TYPES[self.content_type]["category"]
+        return self._content_type["category"]
 
     def is_dummy(self):
         """Check whether the instance is a "dummy" object.
@@ -732,7 +734,7 @@ class DLPlusContentType:
         :return: `True` if the instance is a dummy object, otherwise `False`
         :rtype: bool
         """
-        return bool(self.content_type == "DUMMY")
+        return self.content_type == "DUMMY"
 
     def __str__(self):
         """Return the content type.
@@ -843,6 +845,11 @@ class DLPlusTag(DLPlusContentType):
     0
     >>> tag.length
     10
+
+    You can access the tags low-level DLS code point
+
+    >>> tag.get_code()
+    1
     """
 
     def __init__(self, content_type, start, length):
@@ -876,8 +883,6 @@ class DLPlusTag(DLPlusContentType):
 
         if not isinstance(length, int) or length < 0:
             raise DLPlusTagError("length must be a positive integer")
-
-        self.content_type = content_type
 
         # Dummy objects always have their start and length marker set to 0
         if self.is_dummy():
