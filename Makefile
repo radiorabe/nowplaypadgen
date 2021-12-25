@@ -1,22 +1,18 @@
-.PHONY: install-tox
-install-tox: ## Install tox into local python environment.
-	pip install tox
-
 .PHONY: init
 init: ## Prepare local development environment.
-	pip install -r requirements.txt
+	pip install -r requirements-dev.txt
 
 .PHONY: test
 test: ## Run all tests.
-	python setup.py test
+	pytest --pylint tests/
+
+.PHONY: docs
+docs: api-doc ## Generate documentation.
+	make -C docs html
 
 .PHONY: api-doc
 api-doc: ## Generate API docs using Sphinx.
 	sphinx-apidoc -M -f -o docs/api nowplaypadgen
-
-.PHONY: tox
-tox: install-tox ## Run tests in multiple venvs using tox.
-	tox
 
 .PHONY: help
 help: ## Display this help.
