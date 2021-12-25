@@ -49,11 +49,12 @@ import datetime
 
 import pytz
 
+from nowplaypadgen.util import Error
+
 # @TODO: - Add support for item toggle and running bit
 #        - Add an DL Plus object container
 #        - Linking of DL Plus objects
 
-#: Content type categories according to chapter 5.1 of ETSI TS 102 980
 CATEGORIES = [
     "Dummy",
     "Item",
@@ -63,8 +64,11 @@ CATEGORIES = [
     "Private",
     "Descriptor",
 ]
+"""Content type categories according to chapter 5.1 of ETSI TS 102 980.
 
-#: Content types according to ETSI TS 102 980, Annex A, Table A.1
+    :meta hide-value:
+"""
+
 CONTENT_TYPES = {
     "DUMMY": {"code": 0, "category": CATEGORIES[0], "id3v1": None, "id3v2": None},
     "ITEM.TITLE": {
@@ -356,12 +360,16 @@ CONTENT_TYPES = {
         "id3v2": None,
     },
 }
+"""Content types according to ETSI TS 102 980, Annex A, Table A.1.
+
+   :meta hide-value:
+"""
 
 #: The maximum text limit in bytes according to ETSI TS 102 980, 5.0
 MAXIMUM_TEXT_LIMIT = 128
 
 
-class DLPlusError(Exception):
+class DLPlusError(Error):
     """Base exception for DL Plus."""
 
 

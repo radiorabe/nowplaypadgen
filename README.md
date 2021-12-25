@@ -7,11 +7,17 @@ DAB+ now playing PAD (DLS+ and MOT SLS) generator
 ### Install requirements
 
 ```bash
-pip install -r requirements-dev.txt
+make init
 ```
 
 ### Run Tests
 
 ```bash
-pytest --pylint tests
+make test
+```
+
+### Generate docs
+
+```bash
+make docs
 ```
