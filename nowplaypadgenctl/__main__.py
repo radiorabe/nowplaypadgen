@@ -1,16 +1,20 @@
-"""Main entrypoint for interacting with nowplaypadgen."""
+"""Command line tool to interact with nowplaypadgen."""
 
 import argparse
 import logging
 import os
 import sys
+from distutils.core import run_setup
 
-import nowplaypadgen
+
+def get_version() -> str:
+    """Get version from setup.py."""
+    return run_setup("./setup.py", stop_after="init").version
 
 
 def parse_arguments():  # pragma: no cover
     """Parse arguments passed by user."""
-    parser = argparse.ArgumentParser(description=nowplaypadgen.__doc__)
+    parser = argparse.ArgumentParser(description=__doc__)
 
     default_config = os.path.dirname(__file__) + "../nowplaypadgen.conf"
 
@@ -30,11 +34,12 @@ def parse_arguments():  # pragma: no cover
         "-t", "--title", action="store", help="The title of the currently playing track"
     )
 
+    version = get_version()
     parser.add_argument(
         "-v",
         "--version",
         action="version",
-        version=nowplaypadgen.__version__,
+        version=f"%(prog)s {version}",
         help="Display the version",
     )
 
