@@ -41,7 +41,7 @@ def parse_arguments():  # pragma: no cover
     parser.parse_args()
 
 
-def setup_logging():  # pragma: no cover
+def setup_logging() -> logging.Logger:  # pragma: no cover
     """Prepare logger."""
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
@@ -54,7 +54,6 @@ def setup_logging():  # pragma: no cover
     )
 
     logger.addHandler(stream_handler)
-    logger.error("test")
     return logger
 
 

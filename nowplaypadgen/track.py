@@ -1,4 +1,5 @@
 """Audio Track module."""
+from __future__ import annotations
 
 import uuid
 
@@ -39,7 +40,7 @@ class Track(timeperiod.TimePeriod):
         super().__init__()
 
     @classmethod
-    def from_file(cls, track_path):
+    def from_file(cls, track_path) -> Track:
         """Create Factory for creating a :class:`track.Track` object from a local file.
 
         The factory uses :class:`mutagen.File` to parse the meta data (tags and
@@ -48,7 +49,6 @@ class Track(timeperiod.TimePeriod):
 
         :param str track_path: The file system path to the audio track
         :return: New :class:`track.Track` instance
-        :rtype: Track
         """
         # Pythonic factory class method according to:
         # * https://stackoverflow.com/a/14992545
@@ -82,7 +82,7 @@ class Track(timeperiod.TimePeriod):
 
         return new_track
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the track.
 
         Returns a string in the form of ``<ARTIST> - <TITLE> (<UUID>)`` useful
@@ -90,6 +90,5 @@ class Track(timeperiod.TimePeriod):
 
 
         :return: String containing the track's artist and title
-        :rtype: str
         """
         return f"Track: {self.artist} - {self.title} ({self.uid})"
