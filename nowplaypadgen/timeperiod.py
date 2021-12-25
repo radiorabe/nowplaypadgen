@@ -24,16 +24,15 @@ class TimePeriod:
         self._duration = datetime.timedelta()  #: The period's duration,
 
     @property
-    def starttime(self):
+    def starttime(self) -> datetime.datetime:
         """Get starttime.
 
         :return: The absolute start time of the period in UTC
-        :rtype: datetime.datetime
         """
         return self._starttime
 
     @starttime.setter
-    def starttime(self, starttime):
+    def starttime(self, starttime: datetime.datetime):
         """Setter for starttime which checks for a TZ aware datetime object.
 
         The setter also updates the period's duration if and endtime was
@@ -66,16 +65,15 @@ class TimePeriod:
         self._starttime = starttime
 
     @property
-    def endtime(self):
+    def endtime(self) -> datetime.datetime:
         """Getter for endtime.
 
         :return: The absolute end time of the period in UTC
-        :rtype: datetime.datetime
         """
         return self._endtime
 
     @endtime.setter
-    def endtime(self, endtime):
+    def endtime(self, endtime: datetime.datetime):
         """Setter for endtime which checks for a TZ aware datetime object.
 
         The setter also updates the period's duration if a starttime was
@@ -106,7 +104,7 @@ class TimePeriod:
         self._endtime = endtime
 
     @property
-    def duration(self):
+    def duration(self) -> datetime.timedelta:
         """Getter for duration.
 
         Returns the duration of a period as a :class:`datetime.timedelta`
@@ -115,12 +113,11 @@ class TimePeriod:
         such an object.
 
         :return: The duration of the period
-        :rtype: datetime.timedelta
         """
         return self._duration
 
     @duration.setter
-    def duration(self, duration):
+    def duration(self, duration: datetime.timedelta):
         """Set duration.
 
         Sets the duration of the period and calculates the start or end time if
@@ -152,7 +149,7 @@ class TimePeriod:
 
         self._duration = duration
 
-    def set_length(self, seconds=0.0):
+    def set_length(self, seconds: float = 0.0):
         """Set the length of a period in seconds.
 
         Sets the period's length in seconds, this is a helper wrapper around
@@ -163,39 +160,37 @@ class TimePeriod:
 
         self.duration = datetime.timedelta(seconds=seconds)
 
-    def started(self):
+    def started(self) -> bool:
         """Check if the period has started.
 
         :return: ``True`` if the period has started, otherwise ``False``
         :rtype: bool
         """
-        return bool(
+        return (
             self._starttime is not None
             and datetime.datetime.now(pytz.utc) >= self._starttime
         )
 
-    def ended(self):
+    def ended(self) -> bool:
         """Check if the period has ended.
 
         :return: ``True`` if the period has ended, otherwise ``False``
-        :rtype: bool
         """
-        return bool(
+        return (
             self._endtime is not None
             and datetime.datetime.now(pytz.utc) >= self._endtime
         )
 
-    def active(self):
+    def active(self) -> bool:
         """Check if the period is active.
 
         An active period is defined as one that has started but not ended yet.
 
         :return: ``True`` if the period is active, otherwise ``False``
-        :rtype: bool
         """
-        return bool(self.started() and not self.ended())
+        return self.started() and not self.ended()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the period, useful for logging.
 
         >>> # pylint: disable=line-too-long
@@ -206,7 +201,6 @@ class TimePeriod:
         nowplaypadgen.timeperiod start: 2013-01-01 13:12:00+00:00, end: 2113-01-01 13:12:00+00:00, duration: 36524 days, 0:00:00
 
         :return: String containing the start time, end time and duration
-        :rtype: str
         """
 
         # pylint: disable=line-too-long

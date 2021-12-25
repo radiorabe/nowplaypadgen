@@ -60,7 +60,7 @@ class Show(timeperiod.TimePeriod):
         # Call the parent's constructor
         super().__init__()
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the show, useful for logging.
 
         >>> show = Show('My Show', uid="12345678-1234-1234-1234-123456789012")
@@ -69,7 +69,6 @@ class Show(timeperiod.TimePeriod):
 
         :return: String containing the show's name, start time,
                  end time and URL.
-        :rtype: str
         """
         # pylint: disable=line-too-long
         return f"Show '{self.name}' ({self.uid}) start: {self.starttime}, end: {self.endtime}, url: {self.url}"

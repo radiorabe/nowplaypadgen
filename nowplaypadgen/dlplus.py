@@ -43,6 +43,7 @@ Example ASCII art representation::
             | Text:         My Artist   |   | Text:         My Title    |
             +---------------------------+   +---------------------------+
 """
+from __future__ import annotations
 
 import datetime
 
@@ -433,7 +434,7 @@ class DLPlusMessage:
         #: Status if the message was successfully built
         self._built = False
 
-    def add_dlp_object(self, dlp_object):
+    def add_dlp_object(self, dlp_object: DLPlusObject):
         """Add a :class:`DLPlusObject` to a message string.
 
             This method is intended to be used before building a DL Plus Message.
@@ -463,15 +464,14 @@ class DLPlusMessage:
         # Use the content_type of the DL Plus object as the dictionary key
         self._dlp_objects[dlp_object.content_type] = dlp_object
 
-    def get_dlp_objects(self):
+    def get_dlp_objects(self) -> dict:
         """Return the associated DL Plus objects (:class:`DLPlusObject`).
 
         :return: Dictionary of :class:`DLPlusObject` objects.
-        :rtype: dict
         """
         return self._dlp_objects
 
-    def add_dlp_tag(self, dlp_tag):
+    def add_dlp_tag(self, dlp_tag: DLPlusTag):
         """Add a :class:`DLPlusTag` required for parsing the message.
 
         This method is intended to be used before parsing a DL Plus Message.
@@ -515,15 +515,14 @@ class DLPlusMessage:
 
         self._dlp_tags[dlp_tag.content_type] = dlp_tag
 
-    def get_dlp_tags(self):
+    def get_dlp_tags(self) -> dict:
         """Return the associated DL Plus tags (:class:`DLPlusTag`).
 
         :return: Dictionary of :class:`DLPlusTag` objects.
-        :rtype: dict
         """
         return self._dlp_tags
 
-    def parse(self, message):
+    def parse(self, message: str):
         """Parse a DL Plus `message` into DL Plus objects.
 
         This method parses a given DL Plus `message` into zero or more DL Plus
@@ -566,9 +565,7 @@ class DLPlusMessage:
             # Delete objects have their length marker set to 0 and the start
             # marker set to a blank character, according to ETSI TS 102 980,
             # 6.2 Creating a delete object
-            delete = bool(
-                dlp_tag.length == 0 and message[dlp_tag.start : end + 1] == " "
-            )
+            delete = dlp_tag.length == 0 and message[dlp_tag.start : end + 1] == " "
 
             self._dlp_objects[dlp_tag.content_type] = DLPlusObject(
                 dlp_tag.content_type, message[dlp_tag.start : end], delete
@@ -577,7 +574,7 @@ class DLPlusMessage:
         self._message = message
         self._parsed = True
 
-    def build(self, format_string):
+    def build(self, format_string: str):
         """Build a DL Plus message from a given format and DL Plus objects.
 
         This method builds a DL Plus message string from a given
@@ -657,19 +654,17 @@ class DLPlusMessage:
         self._built = True
 
     @property
-    def message(self):
+    def message(self) -> str:
         """Get :attr:`_message`.
 
         :return: Formatted DL Plus Message
-        :rtype: str
         """
         return self._message
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the formatted DL Plus Message.
 
         :return: Formatted DL Plus Message
-        :rtype: str
         """
 
         return self.message
@@ -678,7 +673,7 @@ class DLPlusMessage:
 class DLPlusContentType:
     """Dynamic Label Plus content type."""
 
-    def __init__(self, content_type):
+    def __init__(self, content_type: str):
         """Create class:`DLPlusContentType` instance.
 
         Creates a new :class:`DLPlusContentType` object with a specific content
@@ -703,19 +698,18 @@ class DLPlusContentType:
         #: Store content_type info for later lookups
         self._content_type = CONTENT_TYPES[content_type]
 
-    def get_code(self):
+    def get_code(self) -> int:
         """Get the content type code.
 
         Returns the content type code according to ETSI TS 102 980, Annex A
         (List of DL Plus content types), Table A.1.
 
         :return: content type code
-        :rtype: int
         """
 
         return self._content_type["code"]
 
-    def get_category(self):
+    def get_category(self) -> str:
         """Get the content type category.
 
         Returns the content type category according to ETSI TS 102 980, Annex A
@@ -726,21 +720,19 @@ class DLPlusContentType:
         """
         return self._content_type["category"]
 
-    def is_dummy(self):
+    def is_dummy(self) -> bool:
         """Check whether the instance is a "dummy" object.
 
         Checks whether the :attr:`content_type`of the instance is set to `DUMMY`
 
         :return: `True` if the instance is a dummy object, otherwise `False`
-        :rtype: bool
         """
         return self.content_type == "DUMMY"
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the content type.
 
         :return: DL Plus content type
-        :rtype: str
         """
         return self.content_type
 
@@ -751,7 +743,7 @@ class DLPlusObject(DLPlusContentType):
     DL Plus object which holds a text string with a defined content type.
     """
 
-    def __init__(self, content_type, text="", delete=False):
+    def __init__(self, content_type: str, text: str = "", delete: bool = False):
         """Create a class:`DLPlusObject` instance.
 
         Creates a new :class:`DLPlusObject` object with a specific content type
@@ -808,23 +800,21 @@ class DLPlusObject(DLPlusContentType):
         self.expiration_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
     @classmethod
-    def create_dummy(cls):
+    def create_dummy(cls) -> DLPlusObject:
         """Create a dummy class:`DLPlusObject` instance.
 
         The factory creates a new :class:`DLPlusObject` dummy object which has
         the content type set to `DUMMY` and the text string to an empty value.
 
         :return: Dummy DL Plus Object
-        :rtype: DLPlusObject
         """
 
         return cls("DUMMY", "")
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the DL Plus objects text.
 
         :return: DL Plus object text
-        :rtype: str
         """
         return self.text
 
@@ -852,7 +842,7 @@ class DLPlusTag(DLPlusContentType):
     1
     """
 
-    def __init__(self, content_type, start, length):
+    def __init__(self, content_type: str, start: int, length: int):
         """Create a class:`DLPlusTag` instance.
 
         Creates a new :class:`DLPlusTag` object with a specific content type
@@ -893,7 +883,7 @@ class DLPlusTag(DLPlusContentType):
         self.length = length
 
     @classmethod
-    def from_message(cls, dlp_message, content_type):
+    def from_message(cls, dlp_message: DLPlusMessage, content_type: str) -> DLPlusTag:
         """Create a class:`DLPlusTag` instance from a :class:`DLPlusMessage`.
 
         The factory creates a new :class:`DLPlusTag` object from an existing
@@ -910,7 +900,6 @@ class DLPlusTag(DLPlusContentType):
 
         :param DLPlusMessage dlp_message: The populated DL Plus message
         :return: DL Plus Tag
-        :rtype: DLPlusTag
         """
 
         # Pythonic factory class method according to:
@@ -941,7 +930,7 @@ class DLPlusTag(DLPlusContentType):
         return cls(content_type, start, length)
 
     @classmethod
-    def create_dummy(cls):
+    def create_dummy(cls) -> DLPlusTag:
         """Create a dummy instance of class:`DLPlusTag`.
 
         This factory creates a :class:`DLPlusTag` dummy instance which has
@@ -949,7 +938,6 @@ class DLPlusTag(DLPlusContentType):
         0 (zero).
 
         :return: Dummy DL Plus Tag
-        :rtype: DLPlusTag
         """
 
         return cls("DUMMY", 0, 0)
