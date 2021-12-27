@@ -46,6 +46,7 @@ Example ASCII art representation::
 from __future__ import annotations
 
 import datetime
+from typing import TypedDict
 
 import pytz
 
@@ -55,7 +56,8 @@ from nowplaypadgen.util import Error
 #        - Add an DL Plus object container
 #        - Linking of DL Plus objects
 
-CATEGORIES = [
+
+CATEGORIES: list[str] = [
     "Dummy",
     "Item",
     "Info",
@@ -69,7 +71,17 @@ CATEGORIES = [
     :meta hide-value:
 """
 
-CONTENT_TYPES = {
+
+class _ContentType(TypedDict):
+    """Type definition for the :attr:`CONTENT_TYPES` dictionary."""
+
+    code: int
+    category: str
+    id3v1: str | None
+    id3v2: str | None
+
+
+CONTENT_TYPES: dict[str, _ContentType] = {
     "DUMMY": {"code": 0, "category": CATEGORIES[0], "id3v1": None, "id3v2": None},
     "ITEM.TITLE": {
         "code": 1,
@@ -704,7 +716,7 @@ class DLPlusContentType:
         #: The content type according to ETSI TS 102 980, Annex A, Table A.1
         self.content_type = content_type
         #: Store content_type info for later lookups
-        self._content_type = CONTENT_TYPES[content_type]
+        self._content_type: _ContentType = CONTENT_TYPES[content_type]
 
     def get_code(self) -> int:
         """Get the content type code.
