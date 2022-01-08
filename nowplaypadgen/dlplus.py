@@ -400,6 +400,9 @@ class DLPlusTagError(DLPlusError):
 class DLPlusObjectError(DLPlusError):
     """DL Plus object related exceptions."""
 
+class DLPlusObjectStoreError(DLPlusError):
+    """DL Plus object store related exceptions"""
+
 
 class DLPlusMessage:
     """Dynamic Label Plus (DL Plus) message.
@@ -473,6 +476,9 @@ class DLPlusMessage:
 
         if not isinstance(dlp_object, DLPlusObject):
             raise DLPlusMessageError("dlp_object has to be a DLPlusObject object")
+
+        # @TODO: Respect the object's possible keyword (linking) by
+        # concatenating the content type and the keyword (or None)
 
         # Up to four DL Plus objects can be created from each DL message
         # according to ETSI TS 102 980, 5.1
@@ -961,3 +967,126 @@ class DLPlusTag(DLPlusContentType):
         """
 
         return cls("DUMMY", 0, 0)
+
+
+@python_2_unicode_compatible
+class DLPlusObjectStore(object):
+    """Dynamic Label Plus (DL Plus) object storage
+
+    DL Plus object storage which manages the life time, updating and deletion
+    of received DL Plus objects, according to `ETSI TS 102 980
+    <http://www.etsi.org/deliver/etsi_ts/102900_102999/102980/02.01.01_60/ts_102980v020101p.pdf>`_,
+    `5.3 Life time, updating and deletion`.
+    """
+
+    def __init__(self):
+        """Constructor for the DLPlusObjectStore
+
+        Creates a new :class:`DLPlusObjectStore` object which can be used to
+        managed the retrieved :class:`DLPlusObject`.
+        """
+
+        #: Dictionary holding the active DL Plus objects
+        self._dlp_objects_active = {}
+
+        #: Dictionary holding the archived DL Plus objects
+        self._dlp_objects_archived = {}
+
+
+    def add_dlp_object(self, dlp_object):
+        """Add a :class:`DLPlusObject` to the DL Plus object store
+
+        The DL Plus object will be added to the object store and will replace
+        an existing object with the same content type (update). In case of
+        linked DL Plus objects (tables), the keyword is taken into account for
+        which object might be replaced (updated).
+
+        A "delete" object will remove (delete) an existing DL Plus object with
+        the same content type. In case of linked DL Plus objects (tables), all
+        of them will be removed (deleted).
+
+        :param DLPlusObject dlp_object: The DL Plus Object to add
+        :raises DLPlusObjectStoreError: when `dlp_object` is not a
+                                        :class:`DLPlusObject` object
+        """
+
+        if not isinstance(dlp_object, DLPlusObject):
+            raise DLPlusObjectStoreError(
+                "dlp_object has to be a DLPlusObject object")
+
+        # @TODO: Respect the object's possible keyword (linking) by
+        # concatenating the content type and the keyword (or None)
+
+        # Remove a possible old object from the active store
+        old_object = \
+            self._dlp_objects_active.pop(dlp_object.content_type, None)
+
+        # Add a possible old object to the archived store.
+        if old_object is not None:
+            old_object.expire() # Set the expiration time stamp
+            self._add_dlp_object_to_archive(old_object)
+
+        # Add or update the DL Plus object according to its content type
+        if not dlp_object.is_delete:
+            self._dlp_objects_active[dlp_object.content_type] = dlp_object
+
+
+    def _add_dlp_object_to_archive(self, dlp_object):
+        """Adds a DL Plus object to the archived object storage
+
+        Sets the DL Plus object's life end time to the current time stamp and
+        adds the object to the archived object storage.
+
+        :param DLPlusObject dlp_object: The DL Plus Object to add
+        """
+
+        dlp_object.set_life_end_time()
+        self._dlp_objects_archived[dlp_object.content_type] = dlp_object
+
+    def add_dlp_message(self, dlp_message):
+        """Add the DL Plus objects of a :class:`DLPlusMessage` to the store
+
+        Adds all the available :class:`DLPlusObject` contained within a parsed
+        :class:`DLPlusMessage` to the DL Plus object store.
+
+        :param DLPlusMessage dlp_message: The DL Plus message to add
+        :raises DLPlusObjectStoreError: when `dlp_message` is not a
+                                        :class:`DLPlusMessage` object
+        """
+
+        if not isinstance(dlp_message, DLPlusMessage):
+            raise DLPlusObjectStoreError(
+                "dlp_message has to be a DLPlusMessage")
+
+        for dlp_object in dlp_message.get_dlp_objects():
+            self.add_dlp_object(dlp_object)
+
+    def reset_active(self):
+        """Removes (resets) all active DL Plus objects from the store
+
+        This method might be called after the user switches to another programme
+        or turns off the receiver.
+        """
+
+        self._dlp_objects_active = {}
+
+    def reset_archived(self):
+        """Removes (resets) all archived DL Plus objects from the store
+
+        This method might be called after the user switches to another programme
+        or turns off the receiver.
+        """
+
+        self._dlp_objects_archived = {}
+
+    def reset_all(self):
+        """Removes (resets) all DL Plus objects from the store
+
+        Removes all active an archived DL Plus objects from the DL Plus object
+        store.
+        This method might be called after the user switches to another programme
+        or turns off the receiver.
+        """
+
+        self.reset_active()
+        self.reset_archived()
