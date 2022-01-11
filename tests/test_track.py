@@ -43,7 +43,7 @@ def test_track_artist_title_assign(track_artist, track_title, track):
 def test_track_string_rep(track):
     """Test the track string representation."""
 
-    expected_string = f"Track: {track.artist} - {track.title} ({track.uid})"
+    expected_string = f"Track: {track.artist} - {track.title} ({track.uuid})"
     assert expected_string == track.__str__()
 
 

@@ -1,7 +1,7 @@
 """Audio Track module."""
 from __future__ import annotations
 
-import uuid
+from uuid import uuid4
 
 import mutagen
 
@@ -24,17 +24,17 @@ class Track(timeperiod.TimePeriod):
         my_track.set_length(60) # The track has a one minute duration
     """
 
-    def __init__(self, artist=None, title=None, uid=uuid.uuid4()):
+    def __init__(self, artist=None, title=None, uuid=uuid4()):
         """Create :class:`track.Track` instance.
 
         :param str artist: The artist of the track
         :param str title: The title of the track
-        :param str uid: The UUID of the track
+        :param str uuid: The UUID of the track
         """
 
         self.artist = artist  #: The track's artist
         self.title = title  #: The track's title
-        self.uid = uid  #: The track's global unique identifier (UUID)
+        self.uuid = uuid  #: The track's global unique identifier (UUID)
         self.tags = {}  #: Optional meta tag dictionary of a track
         # Call the parent's constructor
         super().__init__()
@@ -91,4 +91,4 @@ class Track(timeperiod.TimePeriod):
 
         :return: String containing the track's artist and title
         """
-        return f"Track: {self.artist} - {self.title} ({self.uid})"
+        return f"Track: {self.artist} - {self.title} ({self.uuid})"
