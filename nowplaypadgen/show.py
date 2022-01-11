@@ -1,6 +1,6 @@
 """Show module for broadcast shows."""
 
-import uuid
+from uuid import uuid4
 
 from nowplaypadgen import timeperiod
 
@@ -46,15 +46,15 @@ class Show(timeperiod.TimePeriod):
     True
     """
 
-    def __init__(self, name=None, uid=uuid.uuid4()):
+    def __init__(self, name=None, uuid=uuid4()):
         """Create Show instance.
 
         :param str name: The name of the show.
-        :param uuid.UUID uid: The UUID of the show.
+        :param uuid.UUID uuid: The UUID of the show.
         """
 
         self.name = name  #: The show's name
-        self.uid = uid  #: The show's global unique identifier (UUID)
+        self.uuid = uuid  #: The show's global unique identifier (UUID)
         self.description = None  #: The show's description
         self.url = None  #: The show's URL
         # Call the parent's constructor
@@ -63,7 +63,7 @@ class Show(timeperiod.TimePeriod):
     def __str__(self) -> str:
         """Return a string representation of the show, useful for logging.
 
-        >>> show = Show('My Show', uid="12345678-1234-1234-1234-123456789012")
+        >>> show = Show('My Show', uuid="12345678-1234-1234-1234-123456789012")
         >>> str(show)
         "Show 'My Show' (12345678-1234-1234-1234-123456789012) start: None, end: None, url: None"
 
@@ -71,4 +71,4 @@ class Show(timeperiod.TimePeriod):
                  end time and URL.
         """
         # pylint: disable=line-too-long
-        return f"Show '{self.name}' ({self.uid}) start: {self.starttime}, end: {self.endtime}, url: {self.url}"
+        return f"Show '{self.name}' ({self.uuid}) start: {self.starttime}, end: {self.endtime}, url: {self.url}"
