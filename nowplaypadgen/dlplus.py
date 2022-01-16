@@ -800,6 +800,9 @@ class DLPlusObject(DLPlusContentType):
         # DL Plus dummy objects always have their text set to an empty string
         if self.is_dummy():
             text = ""
+        # DL Plus delete objects always have their text set to a whitespace string
+        if delete:
+            text = " "
 
         #: The text string of the DL Plus object
         self.text = text
@@ -922,6 +925,15 @@ class DLPlusTag(DLPlusContentType):
         >>> f"{tag.content_type} {tag.start} {tag.length}"
         'STATIONNAME.SHORT 6 4'
 
+        It also handles delete tags in messages
+
+        >>> message = DLPlusMessage()
+        >>> message.add_dlp_object(DLPlusObject("ITEM.TITLE", delete=True))
+        >>> message.build("I am string")
+        >>> tag = DLPlusTag.from_message(message, "ITEM.TITLE")
+        >>> f"{tag.content_type} {tag.start} {tag.length}"
+        'ITEM.TITLE 1 0'
+
         :param DLPlusMessage dlp_message: The populated DL Plus message
         :return: DL Plus Tag
         """
@@ -950,6 +962,8 @@ class DLPlusTag(DLPlusContentType):
 
         # Get the string length of the DL Plus object's text
         length = len(dlp_object.text)
+        if dlp_object.is_delete:
+            length = 0
 
         return cls(content_type, start, length)
 

@@ -2,6 +2,50 @@
 
 DAB+ now playing PAD (DLS+ and MOT SLS) generator
 
+## Usage
+
+### DL+
+
+You can use this to generate some DLPlus Tags.
+
+```python
+>>> from nowplaypadgen.dlplus import *
+>>> message = DLPlusMessage()
+>>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio Bern RaBe"))
+>>> message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
+>>> message.add_dlp_object(DLPlusObject("ITEM.TITLE", "Radio Bern"))
+>>> message.build("{o[STATIONNAME.LONG]}")
+>>> message.message
+'Radio Bern RaBe'
+>>> tags = message.get_dlp_tags()
+>>> long = tags['STATIONNAME.LONG']
+>>> f"{long}: {long.code} {long.start} {long.length}"
+'STATIONNAME.LONG: 32 0 15'
+>>> short = tags['STATIONNAME.SHORT']
+>>> f"{short}: {short.code} {short.start} {short.length}"
+'STATIONNAME.SHORT: 31 11 4'
+>>> title = tags['ITEM.TITLE']
+>>> f"{title}: {title.code} {title.start} {title.length}"
+'ITEM.TITLE: 1 0 10'
+
+```
+
+Later on you might want to generate DL+ that deletes an item tag.
+
+```python
+>>> message = DLPlusMessage()
+>>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio Bern RaBe"))
+>>> message.add_dlp_object(DLPlusObject("ITEM.TITLE", delete=True))
+>>> message.build("{o[STATIONNAME.LONG]}")
+>>> message.message
+'Radio Bern RaBe'
+>>> tags = message.get_dlp_tags()
+>>> title = tags['ITEM.TITLE']
+>>> f"{title}: {title.code} {title.start} {title.length}"
+'ITEM.TITLE: 1 5 0'
+
+```
+
 ## Release Management
 
 The CI/CD setup uses semantic commit messages following the [conventional commits standard](https://www.conventionalcommits.org/en/v1.0.0/).
