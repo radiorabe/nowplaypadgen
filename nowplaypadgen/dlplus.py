@@ -632,11 +632,11 @@ class DLPlusMessage:
 
         >>> tags = message.get_dlp_tags()
         >>> long = tags['STATIONNAME.LONG']
-        >>> f"{long} {long.start} {long.length}"
-        'STATIONNAME.LONG 0 10'
+        >>> f"{long}: {long.code} {long.start} {long.length}"
+        'STATIONNAME.LONG: 32 0 10'
         >>> short = tags['STATIONNAME.SHORT']
-        >>> f"{short} {short.start} {short.length}"
-        'STATIONNAME.SHORT 6 4'
+        >>> f"{short}: {short.code} {short.start} {short.length}"
+        'STATIONNAME.SHORT: 31 6 4'
 
         :param str format_string: The DL Plus message string format with content
                                   type replacement patterns in curly braces
@@ -718,25 +718,29 @@ class DLPlusContentType:
         #: Store content_type info for later lookups
         self._content_type: _ContentType = CONTENT_TYPES[content_type]
 
-    def get_code(self) -> int:
+    @property
+    def code(self) -> int:
         """Get the content type code.
 
         Returns the content type code according to ETSI TS 102 980, Annex A
         (List of DL Plus content types), Table A.1.
 
-        :return: content type code
+        :return: The content type code
         """
-
         return self._content_type["code"]
 
-    def get_category(self) -> str:
+    @property
+    def category(self) -> str:
         """Get the content type category.
 
         Returns the content type category according to ETSI TS 102 980, Annex A
         (List of DL Plus content types), Table A.1.
 
-        :return: category string
-        :rtype: str
+        >>> content_type = DLPlusContentType("ITEM.ARTIST")
+        >>> content_type.category
+        'Item'
+
+        :return: The content type category string
         """
         return self._content_type["category"]
 
@@ -858,7 +862,7 @@ class DLPlusTag(DLPlusContentType):
 
     You can access the tags low-level DLS code point
 
-    >>> tag.get_code()
+    >>> tag.code
     1
     """
 

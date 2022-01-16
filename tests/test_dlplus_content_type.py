@@ -26,7 +26,7 @@ def test_content_type_category():
 
     for content_type, category in content_types_to_categories:
         dlp_content_type = DLPlusContentType(content_type)
-        assert dlp_content_type.get_category() == category
+        assert dlp_content_type.category == category
 
 
 def test_content_type_code():
@@ -43,7 +43,7 @@ def test_content_type_code():
 
     for content_type, code in content_types_to_codes:
         dlp_content_type = DLPlusContentType(content_type)
-        assert dlp_content_type.get_code() == code
+        assert dlp_content_type.code == code
 
 
 def test_invalid_content_type():
