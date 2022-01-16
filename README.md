@@ -46,6 +46,32 @@ Later on you might want to generate DL+ that deletes an item tag.
 
 ```
 
+Finally, you can render it as an [ODR-PadEnc](https://github.com/opendigitalradio/ODR-PadEnc) style string.
+
+```python
+>>> from nowplaypadgen.dlplus import *
+>>> message = DLPlusMessage()
+>>> message.add_dlp_object(DLPlusObject("ITEM.TITLE", "Radio Bern"))
+>>> message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
+>>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio Bern RaBe"))
+>>> message.build("{o[STATIONNAME.LONG]}")
+>>> from nowplaypadgen.renderer.odr import ODRPadEncRenderer
+>>> renderer = ODRPadEncRenderer(message)
+
+```
+
+This will generate the following ODR-PadEnc style DLS string when rendered with `print(renderer)`:
+
+```
+##### parameters { #####
+DL_PLUS=1
+DL_PLUS_TAG=1 0 10
+DL_PLUS_TAG=31 11 4
+DL_PLUS_TAG=32 0 15
+##### parameters } #####
+Radio Bern RaBe
+```
+
 ## Release Management
 
 The CI/CD setup uses semantic commit messages following the [conventional commits standard](https://www.conventionalcommits.org/en/v1.0.0/).
