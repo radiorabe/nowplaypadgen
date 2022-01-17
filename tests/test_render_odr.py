@@ -1,3 +1,5 @@
+"""Test rendering of ODR-PadEnc style strings."""
+
 from nowplaypadgen.dlplus import DLPlusMessage, DLPlusObject
 from nowplaypadgen.renderer.odr import ODRPadEncRenderer
 
@@ -14,7 +16,7 @@ def test_render_odr():
     renderer = ODRPadEncRenderer(message)
     output = str(renderer)
 
-    assert output.split("\n")[0] == "##### parameters { #####"
+    assert output.split("\n", maxsplit=1)[0] == "##### parameters { #####"
     assert output.split("\n")[1] == "DL_PLUS=1"
     assert output.split("\n")[5] == "##### parameters } #####"
     assert output.split("\n")[6] == "Radio Bern RaBe"
