@@ -7,16 +7,13 @@ test: ## Run all tests.
 	pytest --pylint tests/
 
 .PHONY: docs
-docs: api-doc ## Generate documentation.
+docs: ## Generate documentation.
 	make -C docs html
-
-.PHONY: api-doc
-api-doc: ## Generate API docs using Sphinx.
-	sphinx-apidoc -M -f -o docs/api nowplaypadgen
 
 .PHONY: clean
 clean:  ## Clean dist
-	rm -rf dist/ build/ .eggs/
+	make -C docs clean
+	rm -rf docs/api dist/ build/ .eggs/
 
 .PHONY: dist
 dist: clean ## Build dist
