@@ -44,7 +44,7 @@ class ODRPadEncRenderer:
 
         >>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio RaBe"))
         >>> message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
-        >>> message.build("{o[STATIONNAME.LONG]}")
+        >>> message.build("$STATIONNAME.LONG")
         >>> string = str(odr)
         >>> "##### parameters { #####" in string
         True

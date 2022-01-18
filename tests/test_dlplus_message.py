@@ -38,7 +38,7 @@ def fixture_prefix():
 @pytest.fixture(name="format_string")
 def fixture_format_string(prefix):
     """Format string fixture."""
-    return prefix + "{o[ITEM.TITLE]} - {o[ITEM.ARTIST]}"
+    return prefix + "${ITEM.TITLE} - ${ITEM.ARTIST}"
 
 
 @pytest.fixture(name="title_start")
@@ -69,12 +69,6 @@ def fixture_artist_length(artist):
 def fixture_mapping(title, artist):
     """Return mapping fixture."""
     return {"ITEM.TITLE": title, "ITEM.ARTIST": artist}
-
-
-@pytest.fixture(name="message_string")
-def fixture_message_string(format_string, mapping):
-    """Message string fixture."""
-    return format_string.format(o=mapping)
 
 
 @pytest.fixture(name="title_content_type")
@@ -215,14 +209,14 @@ def test_maximum_dlp_tags(dlp_msg):
 
 
 def test_parse_message(
-    dlp_msg, dlp_title_tag, dlp_artist_tag, message_string, title, artist
+    dlp_msg, dlp_title_tag, dlp_artist_tag, title, artist
 ):  # pylint: disable=too-many-arguments
     """Test the parsing of a DL Plus message."""
 
     dlp_msg.add_dlp_tag(dlp_title_tag)
     dlp_msg.add_dlp_tag(dlp_artist_tag)
 
-    dlp_msg.parse(message_string)
+    dlp_msg.parse(f"Now playing: {title} - {artist}")
 
     dlp_objects = dlp_msg.get_dlp_objects()
 
@@ -239,7 +233,7 @@ def test_parse_message(
     assert not dlp_objects["ITEM.ARTIST"].is_delete
 
 
-def test_dlp_delete_object(dlp_msg, message_string):
+def test_dlp_delete_object(dlp_msg):
     """Test the retrieval of a DL Plus delete object."""
 
     content_type = "INFO.NEWS"
@@ -249,7 +243,7 @@ def test_dlp_delete_object(dlp_msg, message_string):
     dlp_delete_tag = DLPlusTag(content_type, 12, 0)
     dlp_msg.add_dlp_tag(dlp_delete_tag)
 
-    dlp_msg.parse(message_string)
+    dlp_msg.parse("Now playing: Never gonna give you up - Rick Astley")
 
     dlp_objects = dlp_msg.get_dlp_objects()
 
@@ -265,11 +259,12 @@ def test_build_message(
     dlp_title_obj,
     dlp_artist_obj,
     format_string,
-    message_string,
     artist_start,
     artist_length,
     title_start,
     title_length,
+    title,
+    artist,
 ):  # pylint: disable=too-many-arguments
     """Test the building of a DL Plus message."""
 
@@ -281,7 +276,7 @@ def test_build_message(
     dlp_tags = dlp_msg.get_dlp_tags()
 
     # Check that the message was correctly built
-    assert dlp_msg.message == message_string
+    assert dlp_msg.message == f"Now playing: {title} - {artist}"
 
     # A dictionary with two DLPlusTag objects is expected.
     assert isinstance(dlp_tags, dict)

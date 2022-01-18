@@ -46,6 +46,7 @@ Example ASCII art representation::
 from __future__ import annotations
 
 import datetime
+from string import Template
 from typing import TypedDict
 
 import pytz
@@ -418,7 +419,7 @@ class DLPlusMessage:
 
     Render it using the :meth:`build` method.
 
-    >>> message.build("{o[ITEM.TITLE]}")
+    >>> message.build("$ITEM.TITLE")
     >>> str(message)
     'Title'
 
@@ -600,13 +601,13 @@ class DLPlusMessage:
         This method builds a DL Plus message string from a given
         `format_string` and up to four DL Plus objects (:class:`DLPlusObject`).
         The DL Plus object's text will replace any corresponding content type
-        pattern (``{o[CONTENT.TYPE]}``) within the `format_string` (with the
-        help of :meth:`str.format()`). Apart from that, the required DL Plus
+        pattern (``$CONTENT.TYPE``) within the `format_string` (with the
+        help of :class:`string.Template()`). Apart from that, the required DL Plus
         tags (:class:`DLPlusTag`) will be created, with the correct `start` and
         `length` markers.
 
         For example, the following `format_string`
-        ``Now playing: {o[ITEM.ARTIST]} - {o[ITEM.TITLE]}`` will be built into
+        ``Now playing: $ITEM.ARTIST - $ITEM.TITLE`` will be built into
         ``Now playing: My Artist - My Title``, given that two DL Plus objects
         (:class:`DLPlusObjects`) with the corresponding content types are
         available. Furthermore, two related DL Plus tags (:class:`DLPlusTag`)
@@ -623,7 +624,7 @@ class DLPlusMessage:
         You can then use the :meth:`DLPlusMessage.build()` method to build the
         DL Plus message string and create the DL Plus tags (:class:`DLPlusTag`).
 
-        >>> message.build("{o[STATIONNAME.LONG]}")
+        >>> message.build("$STATIONNAME.LONG")
         >>> message.message
         'Radio RaBe'
 
@@ -638,20 +639,21 @@ class DLPlusMessage:
         >>> f"{short}: {short.code} {short.start} {short.length}"
         'STATIONNAME.SHORT: 31 6 4'
 
-        :param str format_string: The DL Plus message string format with content
-                                  type replacement patterns in curly braces
-                                  (such as ``{o[CONTENT.TYPE]}``).
+        :param str format_string: The DL Plus message string format with the
+                                  placeholder introducing delimiter `$` to
+                                  specify what content type to render
+                                  (such as ``$CONTENT.TYPE``).
         :raises DLPlusMessageError: if the message exceeds the maximum allowed
                                     size in bytes (:attr:`MAXIMUM_TEXT_LIMIT`).
         """
         self.format_string = format_string
 
-        # Create the message according to the available DLPlusObjects
-        # Note, that we have to use a parameter assignment
-        # (o=self._dlp_objects) here, rather than directly unpack the
-        # dictionary (via .format(**self._dlp_objects)). As dots in
-        # keys for str.format() are not allowed and will result in KeyError
-        message = self.format_string.format(o=self._dlp_objects)
+        class TemplateWithDots(Template):
+            """Allow uppercase and dots in identifiers."""
+
+            idpattern = r"[_a-zA-Z][\._a-zA-Z0-9]*"
+
+        message = TemplateWithDots(format_string).substitute(self._dlp_objects)
 
         # Make sure that the byte length of the message doesn't exceed the
         # maximum allowed limit.
@@ -920,7 +922,7 @@ class DLPlusTag(DLPlusContentType):
         >>> message = DLPlusMessage()
         >>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio RaBe"))
         >>> message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
-        >>> message.build("{o[STATIONNAME.LONG]}")
+        >>> message.build("$STATIONNAME.LONG")
         >>> tag = DLPlusTag.from_message(message, "STATIONNAME.SHORT")
         >>> f"{tag.content_type} {tag.start} {tag.length}"
         'STATIONNAME.SHORT 6 4'

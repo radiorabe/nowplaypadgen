@@ -11,7 +11,7 @@ def test_render_odr():
     message.add_dlp_object(DLPlusObject("ITEM.TITLE", "Radio Bern"))
     message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
     message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio Bern RaBe"))
-    message.build("{o[STATIONNAME.LONG]}")
+    message.build("$STATIONNAME.LONG")
 
     renderer = ODRPadEncRenderer(message)
     output = str(renderer)

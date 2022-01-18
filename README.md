@@ -14,7 +14,7 @@ You can use this to generate some DLPlus Tags.
 >>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio Bern RaBe"))
 >>> message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
 >>> message.add_dlp_object(DLPlusObject("ITEM.TITLE", "Radio Bern"))
->>> message.build("{o[STATIONNAME.LONG]}")
+>>> message.build("$STATIONNAME.LONG")
 >>> message.message
 'Radio Bern RaBe'
 >>> tags = message.get_dlp_tags()
@@ -36,7 +36,7 @@ Later on you might want to generate DL+ that deletes an item tag.
 >>> message = DLPlusMessage()
 >>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio Bern RaBe"))
 >>> message.add_dlp_object(DLPlusObject("ITEM.TITLE", delete=True))
->>> message.build("{o[STATIONNAME.LONG]}")
+>>> message.build("$STATIONNAME.LONG")
 >>> message.message
 'Radio Bern RaBe'
 >>> tags = message.get_dlp_tags()
@@ -54,7 +54,7 @@ Finally, you can render it as an [ODR-PadEnc](https://github.com/opendigitalradi
 >>> message.add_dlp_object(DLPlusObject("ITEM.TITLE", "Radio Bern"))
 >>> message.add_dlp_object(DLPlusObject("STATIONNAME.SHORT", "RaBe"))
 >>> message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio Bern RaBe"))
->>> message.build("{o[STATIONNAME.LONG]}")
+>>> message.build("$STATIONNAME.LONG")
 >>> from nowplaypadgen.renderer.odr import ODRPadEncRenderer
 >>> renderer = ODRPadEncRenderer(message)
 
