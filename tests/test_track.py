@@ -44,7 +44,7 @@ def test_track_string_rep(track):
     """Test the track string representation."""
 
     expected_string = f"Track: {track.artist} - {track.title} ({track.uuid})"
-    assert expected_string == track.__str__()
+    assert expected_string == str(track)
 
 
 @mock.patch("mutagen.File")
