@@ -9,7 +9,7 @@ flake8-tuple==0.4.1
 groundwork-sphinx-theme==1.1.1
 isort==5.10.1
 markdown==3.4.1
-m2r2==0.3.2
+m2r2==0.3.3
 mock==4.0.3
 pytest==7.1.2
 pytest-cov==3.0.0
