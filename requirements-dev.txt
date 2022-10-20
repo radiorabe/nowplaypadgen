@@ -19,7 +19,7 @@ pytest-pylint==0.19.0
 pytest-random-order==1.0.4
 sphinx==5.2.3
 twine==4.0.1
-types-mock==4.0.15
+types-mock==4.0.15.1
 types-pytz==2022.4.0.0
 types-setuptools==65.4.0.0
 wheel==0.37.1
