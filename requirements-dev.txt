@@ -22,4 +22,4 @@ twine==4.0.2
 types-mock==5.0.0.5
 types-pytz==2022.7.1.2
 types-setuptools==67.6.0.0
-wheel==0.38.4
+wheel==0.40.0
