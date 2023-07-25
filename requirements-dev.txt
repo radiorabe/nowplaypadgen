@@ -17,7 +17,7 @@ pytest-env==0.8.2
 pytest-mypy==0.10.3
 pytest-pylint==0.19.0
 pytest-random-order==1.1.0
-sphinx==7.0.1
+sphinx==7.1.0
 twine==4.0.2
 types-mock==5.1.0.1
 types-pytz==2023.3.0.0
