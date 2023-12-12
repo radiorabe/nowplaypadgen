@@ -7,7 +7,7 @@ flake8-isort==6.1.1
 flake8-string-format==0.3.0
 flake8-tuple==0.4.1
 groundwork-sphinx-theme==1.1.1
-isort==5.12.0
+isort==5.13.1
 markdown==3.5.1
 m2r2==0.3.3.post2
 mock==5.1.0
