@@ -1,6 +1,5 @@
 """Test :class:`DLPlusTag`."""
 
-
 import pytest
 
 from nowplaypadgen.dlplus import (

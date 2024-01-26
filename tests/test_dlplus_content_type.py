@@ -1,6 +1,5 @@
 """Test :class:`DLPlusContentType`."""
 
-
 import pytest
 
 from nowplaypadgen.dlplus import DLPlusContentType, DLPlusContentTypeError
