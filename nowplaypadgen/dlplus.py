@@ -43,6 +43,7 @@ Example ASCII art representation::
             | Text:         My Artist   |   | Text:         My Title    |
             +---------------------------+   +---------------------------+
 """
+
 from __future__ import annotations
 
 import datetime
