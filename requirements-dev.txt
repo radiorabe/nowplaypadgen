@@ -20,6 +20,6 @@ pytest-random-order==1.1.1
 sphinx==7.2.6
 twine==4.0.2
 types-mock==5.1.0.20240106
-types-pytz==2023.4.0.20240130
+types-pytz==2024.1.0.20240203
 types-setuptools==69.0.0.20240125
 wheel==0.42.0
