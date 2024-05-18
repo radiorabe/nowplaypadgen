@@ -18,7 +18,7 @@ pytest-mypy==0.10.3
 pytest-pylint==0.21.0
 pytest-random-order==1.1.1
 sphinx==7.3.7
-twine==5.0.0
+twine==5.1.0
 types-mock==5.1.0.20240425
 types-pytz==2024.1.0.20240417
 types-setuptools==69.5.0.20240513
