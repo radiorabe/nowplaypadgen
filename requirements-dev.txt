@@ -21,5 +21,5 @@ sphinx==7.3.7
 twine==5.1.0
 types-mock==5.1.0.20240425
 types-pytz==2024.1.0.20240417
-types-setuptools==69.5.0.20240519
+types-setuptools==70.0.0.20240523
 wheel==0.43.0
