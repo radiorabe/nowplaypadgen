@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "nowplaypadgen"
+version = "0.0.0" # 0.0.0 placeholder is replaced on release
+description = "DAB+ now playing PAD (DLS+ generator)"
+repository = "https://github.com/radiorabe/nowplaypadgen"
+authors = ["RaBe IT-Reaktion <it@rabe.ch>"]
+license = "AGPL-3"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+]
+readme = "README.md"
+packages = [
+    { include = "nowplaypadgen" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+mutagen = "^1.47"
+pytz = "^2024.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3"
+pytest-cov = "^6.0"
+pytest-env = "^1.1"
+pytest-random-order = "^1.1"
+pytest-ruff = "^0.4"
+ruff = "^0.8"
+types-mock = "^5.1"
+types-pytz = "^2024.2"
+types-setuptools = "^75.6"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.5.49"
+mkdocs-autorefs = "^1.2.0"
+mkdocs-gen-files = "^0.5.0"
+mkdocs-literate-nav = "^0.6.1"
+mkdocs-section-index = "^0.3.9"
+mkdocstrings-python = "^1.12.2"
+
+[tool.pytest.ini_options]
+minversion = "7.2"
+addopts = "-ra -q --random-order --doctest-glob='*.md' --doctest-modules --cov=nowplaypadgen --cov-fail-under=100 --ruff --ruff-format --ignore docs"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
