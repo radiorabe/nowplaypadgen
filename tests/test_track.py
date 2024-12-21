@@ -1,6 +1,7 @@
 """Test :class:`Track`."""
 
-import mock
+from unittest import mock
+
 import pytest
 
 from nowplaypadgen.timeperiod import TimePeriod

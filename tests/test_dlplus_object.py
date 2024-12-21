@@ -107,6 +107,6 @@ def test_maximum_text_limit(content_type):
 def test_delete_object_creation(content_type, text):
     """Test the creation of a new DL Plus delete object."""
 
-    dlp_object = DLPlusObject(content_type, text, True)
+    dlp_object = DLPlusObject(content_type, text, delete=True)
 
     assert dlp_object.is_delete

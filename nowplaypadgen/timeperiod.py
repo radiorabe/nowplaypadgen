@@ -1,5 +1,7 @@
 """A Module which helps to deal with time periods."""
 
+from __future__ import annotations
+
 import datetime
 
 import pytz
@@ -16,15 +18,16 @@ class TimePeriod:
     it can be active, started or already ended.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create class:`TimePeriod` instance."""
-
-        self._starttime = None  #: The period's start time, initially set to None
-        self._endtime = None  #: The period's end time, initially set to None
+        # The period's start time, initially set to None
+        self._starttime: datetime.datetime | None = None
+        # The period's end time, initially set to None
+        self._endtime: datetime.datetime | None = None
         self._duration = datetime.timedelta()  #: The period's duration,
 
     @property
-    def starttime(self) -> datetime.datetime:
+    def starttime(self) -> datetime.datetime | None:
         """Get starttime.
 
         :return: The absolute start time of the period in UTC
@@ -32,7 +35,7 @@ class TimePeriod:
         return self._starttime
 
     @starttime.setter
-    def starttime(self, starttime: datetime.datetime):
+    def starttime(self, starttime: datetime.datetime) -> None:
         """Setter for starttime which checks for a TZ aware datetime object.
 
         The setter also updates the period's duration if and endtime was
@@ -43,12 +46,13 @@ class TimePeriod:
         :raises TimePeriodError: when starttime is not a datetime object or is
                                  TZ unaware (naive)
         """
-
         if not isinstance(starttime, datetime.datetime):
-            raise TimePeriodError("starttime has to be a datetime object")
+            msg = "starttime has to be a datetime object"
+            raise TimePeriodError(msg)
 
         if starttime.tzinfo is None or starttime.tzinfo.utcoffset(starttime) is None:
-            raise TimePeriodError("starttime has to be a TZ aware datetime object")
+            msg = "starttime has to be a TZ aware datetime object"
+            raise TimePeriodError(msg)
 
         # UTC will be used internally to simplify date and time
         # arithmetic and avoid common problems with DST boundaries.
@@ -65,7 +69,7 @@ class TimePeriod:
         self._starttime = starttime
 
     @property
-    def endtime(self) -> datetime.datetime:
+    def endtime(self) -> datetime.datetime | None:
         """Getter for endtime.
 
         :return: The absolute end time of the period in UTC
@@ -73,7 +77,7 @@ class TimePeriod:
         return self._endtime
 
     @endtime.setter
-    def endtime(self, endtime: datetime.datetime):
+    def endtime(self, endtime: datetime.datetime) -> None:
         """Setter for endtime which checks for a TZ aware datetime object.
 
         The setter also updates the period's duration if a starttime was
@@ -84,10 +88,12 @@ class TimePeriod:
                            is TZ unaware (naive)
         """
         if not isinstance(endtime, datetime.datetime):
-            raise TimePeriodError("endtime has to be a datetime object")
+            msg = "endtime has to be a datetime object"
+            raise TimePeriodError(msg)
 
         if endtime.tzinfo is None or endtime.tzinfo.utcoffset(endtime) is None:
-            raise TimePeriodError("endtime has to be a TZ aware datetime object")
+            msg = "endtime has to be a TZ aware datetime object"
+            raise TimePeriodError(msg)
 
         # UTC will be used internally to simplify date and time
         # arithmetic and avoid common problems with DST boundaries.
@@ -117,7 +123,7 @@ class TimePeriod:
         return self._duration
 
     @duration.setter
-    def duration(self, duration: datetime.timedelta):
+    def duration(self, duration: datetime.timedelta) -> None:
         """Set duration.
 
         Sets the duration of the period and calculates the start or end time if
@@ -130,16 +136,18 @@ class TimePeriod:
                                  and endtime are already set (as this might
                                  change the period).
         """
-
         if not isinstance(duration, datetime.timedelta):
-            raise TimePeriodError("duration has to be a timedelta object")
+            msg = "duration has to be a timedelta object"
+            raise TimePeriodError(msg)
 
         if duration < datetime.timedelta(0):
-            raise TimePeriodError("duration must be positive")
+            msg = "duration must be positive"
+            raise TimePeriodError(msg)
 
         # Prevent the start or end time from being changed once they are set
         if self.starttime is not None and self.endtime is not None:
-            raise TimePeriodError("duration already defined")
+            msg = "duration already defined"
+            raise TimePeriodError(msg)
 
         # Automatically set a missing start or end time
         if self.endtime is None and self.starttime is not None:
@@ -149,7 +157,7 @@ class TimePeriod:
 
         self._duration = duration
 
-    def set_length(self, seconds: float = 0.0):
+    def set_length(self, seconds: float = 0.0) -> None:
         """Set the length of a period in seconds.
 
         Sets the period's length in seconds, this is a helper wrapper around
@@ -157,7 +165,6 @@ class TimePeriod:
 
         :param float seconds: The length or duration of the period in seconds
         """
-
         self.duration = datetime.timedelta(seconds=seconds)
 
     def started(self) -> bool:
@@ -193,7 +200,6 @@ class TimePeriod:
     def __str__(self) -> str:
         """Return a string representation of the period, useful for logging.
 
-        >>> # pylint: disable=line-too-long
         >>> p = TimePeriod()
         >>> p.starttime = datetime.datetime(2013, 1, 1, 13, 12, 0, tzinfo=pytz.utc)
         >>> p.endtime = datetime.datetime(2113, 1, 1, 13, 12, 0, tzinfo=pytz.utc)
@@ -201,7 +207,5 @@ class TimePeriod:
         nowplaypadgen.timeperiod start: 2013-01-01 13:12:00+00:00, end: 2113-01-01 13:12:00+00:00, duration: 36524 days, 0:00:00
 
         :return: String containing the start time, end time and duration
-        """
-
-        # pylint: disable=line-too-long
-        return f"{__name__} start: {self.starttime}, end: {self.endtime}, duration: {self.duration}"
+        """  # noqa: E501
+        return f"{__name__} start: {self.starttime}, end: {self.endtime}, duration: {self.duration}"  # noqa: E501

@@ -2,11 +2,16 @@
 
 from __future__ import annotations
 
-from uuid import uuid4
+from typing import TYPE_CHECKING
+from uuid import UUID, uuid4
 
 import mutagen
 
 from nowplaypadgen import timeperiod
+
+if TYPE_CHECKING:  # pragma: no cover
+    from pathlib import Path
+    from typing import Self
 
 
 class TrackError(Exception):
@@ -25,23 +30,29 @@ class Track(timeperiod.TimePeriod):
         my_track.set_length(60) # The track has a one minute duration
     """
 
-    def __init__(self, artist=None, title=None, uuid=uuid4()):
+    def __init__(
+        self: Self,
+        artist: str | None = None,
+        title: str | None = None,
+        uuid: UUID | None = None,
+    ) -> None:
         """Create :class:`track.Track` instance.
 
         :param str artist: The artist of the track
         :param str title: The title of the track
         :param str uuid: The UUID of the track
         """
-
         self.artist = artist  #: The track's artist
         self.title = title  #: The track's title
         self.uuid = uuid  #: The track's global unique identifier (UUID)
-        self.tags = {}  #: Optional meta tag dictionary of a track
+        if self.uuid is None:
+            self.uuid = uuid4()
+        self.tags: dict[str, str] = {}  #: Optional meta tag dictionary of a track
         # Call the parent's constructor
         super().__init__()
 
     @classmethod
-    def from_file(cls, track_path) -> Track:
+    def from_file(cls, track_path: Path) -> Track:
         """Create Factory for creating a :class:`track.Track` object from a local file.
 
         The factory uses :class:`mutagen.File` to parse the meta data (tags and

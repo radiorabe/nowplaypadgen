@@ -1,6 +1,9 @@
 """Show module for broadcast shows."""
 
-from uuid import uuid4
+from __future__ import annotations
+
+from typing import Self
+from uuid import UUID, uuid4
 
 from nowplaypadgen import timeperiod
 
@@ -46,15 +49,20 @@ class Show(timeperiod.TimePeriod):
     True
     """
 
-    def __init__(self, name=None, uuid=uuid4()):
+    def __init__(
+        self: Self,
+        name: str | None = None,
+        uuid: UUID | None = None,
+    ) -> None:
         """Create Show instance.
 
         :param str name: The name of the show.
         :param uuid.UUID uuid: The UUID of the show.
         """
-
         self.name = name  #: The show's name
         self.uuid = uuid  #: The show's global unique identifier (UUID)
+        if self.uuid is None:
+            self.uuid = uuid4()
         self.description = None  #: The show's description
         self.url = None  #: The show's URL
         # Call the parent's constructor
@@ -69,6 +77,5 @@ class Show(timeperiod.TimePeriod):
 
         :return: String containing the show's name, start time,
                  end time and URL.
-        """
-        # pylint: disable=line-too-long
-        return f"Show '{self.name}' ({self.uuid}) start: {self.starttime}, end: {self.endtime}, url: {self.url}"
+        """  # noqa: E501
+        return f"Show '{self.name}' ({self.uuid}) start: {self.starttime}, end: {self.endtime}, url: {self.url}"  # noqa: E501

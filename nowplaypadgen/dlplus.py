@@ -436,13 +436,12 @@ class DLPlusMessage:
     <class 'nowplaypadgen.dlplus.DLPlusTag'>
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Create class:`DLPlusMessage` instance.
 
         Creates a new :class:`DLPlusMessage` object which can be used to parse
         or build a DL Plus message string.
         """
-
         #: The format string from which the message will be built
         self.format_string = ""
         #: The formatted DL Plus message
@@ -456,7 +455,7 @@ class DLPlusMessage:
         #: Status if the message was successfully built
         self._built = False
 
-    def add_dlp_object(self, dlp_object: DLPlusObject):
+    def add_dlp_object(self, dlp_object: DLPlusObject) -> None:
         """Add a :class:`DLPlusObject` to a message string.
 
             This method is intended to be used before building a DL Plus Message.
@@ -472,16 +471,16 @@ class DLPlusMessage:
                                         maximum of four :class:`DLPlusObject`
                                         objects where already added.
         """
-
         if not isinstance(dlp_object, DLPlusObject):
-            raise DLPlusMessageError("dlp_object has to be a DLPlusObject object")
+            msg = "dlp_object has to be a DLPlusObject object"
+            raise DLPlusMessageError(msg)
 
         # Up to four DL Plus objects can be created from each DL message
         # according to ETSI TS 102 980, 5.1
-        if len(self._dlp_objects) >= 4:
-            raise DLPlusMessageError(
-                "Only a maximum of 4 DLPlusObject objects can be added"
-            )
+        _dlplus_max_objects = 4
+        if len(self._dlp_objects) >= _dlplus_max_objects:
+            msg = "Only a maximum of 4 DLPlusObject objects can be added"
+            raise DLPlusMessageError(msg)
 
         # Use the content_type of the DL Plus object as the dictionary key
         self._dlp_objects[dlp_object.content_type] = dlp_object
@@ -493,7 +492,7 @@ class DLPlusMessage:
         """
         return self._dlp_objects
 
-    def add_dlp_tag(self, dlp_tag: DLPlusTag):
+    def add_dlp_tag(self, dlp_tag: DLPlusTag) -> None:
         """Add a :class:`DLPlusTag` required for parsing the message.
 
         This method is intended to be used before parsing a DL Plus Message.
@@ -524,16 +523,16 @@ class DLPlusMessage:
                                     of four :class:`DLPlusTag` objects where
                                     already added.
         """
-
         if not isinstance(dlp_tag, DLPlusTag):
-            raise DLPlusMessageError("dlp_tag has to be a DLPlusTag object")
+            msg = "dlp_tag has to be a DLPlusTag object"
+            raise DLPlusMessageError(msg)
 
         # Up to four DL Plus tags can be created from each DL message
         # according to ETSI TS 102 980, 5.1
-        if len(self._dlp_tags) >= 4:
-            raise DLPlusMessageError(
-                "Only a maximum of 4 DLPlusTag objects can be added"
-            )
+        _dlplus_max_objects = 4
+        if len(self._dlp_tags) >= _dlplus_max_objects:
+            msg = "Only a maximum of 4 DLPlusTag objects can be added"
+            raise DLPlusMessageError(msg)
 
         self._dlp_tags[dlp_tag.content_type] = dlp_tag
 
@@ -544,7 +543,7 @@ class DLPlusMessage:
         """
         return self._dlp_tags
 
-    def parse(self, message: str):
+    def parse(self, message: str) -> None:
         """Parse a DL Plus `message` into DL Plus objects.
 
         This method parses a given DL Plus `message` into zero or more DL Plus
@@ -575,13 +574,12 @@ class DLPlusMessage:
 
         :param str message: The DL Plus message string which should be parsed
         """
-
         # Reset the DLPlusObjects
         self._dlp_objects = {}
 
         # Extract sub strings from the message according to the DLPlusTag
         # objects to create DLPLusObject objects
-        for _, dlp_tag in self._dlp_tags.items():
+        for dlp_tag in self._dlp_tags.values():
             end = dlp_tag.start + dlp_tag.length
 
             # Delete objects have their length marker set to 0 and the start
@@ -596,7 +594,7 @@ class DLPlusMessage:
         self._message = message
         self._parsed = True
 
-    def build(self, format_string: str):
+    def build(self, format_string: str) -> None:
         """Build a DL Plus message from a given format and DL Plus objects.
 
         This method builds a DL Plus message string from a given
@@ -659,9 +657,8 @@ class DLPlusMessage:
         # Make sure that the byte length of the message doesn't exceed the
         # maximum allowed limit.
         if len(message.encode("utf-8")) > MAXIMUM_TEXT_LIMIT:
-            raise DLPlusMessageError(
-                f"Message is longer than {MAXIMUM_TEXT_LIMIT} bytes"
-            )
+            msg = f"Message is longer than {MAXIMUM_TEXT_LIMIT} bytes"
+            raise DLPlusMessageError(msg)
 
         self._message = message
 
@@ -669,7 +666,7 @@ class DLPlusMessage:
         self._dlp_tags = {}
 
         # Create DLPlusTags from the message and DLPlusObjects
-        for _, dlp_object in self._dlp_objects.items():
+        for dlp_object in self._dlp_objects.values():
             self._dlp_tags[dlp_object.content_type] = DLPlusTag.from_message(
                 self, dlp_object.content_type
             )
@@ -689,14 +686,13 @@ class DLPlusMessage:
 
         :return: Formatted DL Plus Message
         """
-
         return self.message
 
 
 class DLPlusContentType:
     """Dynamic Label Plus content type."""
 
-    def __init__(self, content_type: str):
+    def __init__(self, content_type: str) -> None:
         """Create class:`DLPlusContentType` instance.
 
         Creates a new :class:`DLPlusContentType` object with a specific content
@@ -712,9 +708,9 @@ class DLPlusContentType:
                                  A.1
         :raises DLPlusContentTypeError: if an invalid content type was specified
         """
-
         if content_type not in CONTENT_TYPES:
-            raise DLPlusContentTypeError(f"Invalid content_type: {content_type}")
+            msg = f"Invalid content_type: {content_type}"
+            raise DLPlusContentTypeError(msg)
 
         #: The content type according to ETSI TS 102 980, Annex A, Table A.1
         self.content_type = content_type
@@ -770,7 +766,7 @@ class DLPlusObject(DLPlusContentType):
     DL Plus object which holds a text string with a defined content type.
     """
 
-    def __init__(self, content_type: str, text: str = "", delete: bool = False):
+    def __init__(self, content_type: str, text: str = "", delete: bool = False) -> None:  # noqa: FBT001,FBT002
         """Create a class:`DLPlusObject` instance.
 
         Creates a new :class:`DLPlusObject` object with a specific content type
@@ -790,7 +786,6 @@ class DLPlusObject(DLPlusContentType):
         :raises DLPlusMessageError: if the text exceeds the maximum allowed size
                                     in bytes (:attr:`MAXIMUM_TEXT_LIMIT`).
         """
-
         # Call the parent constructor which will assign self.content_type
         super().__init__(content_type)
 
@@ -798,7 +793,8 @@ class DLPlusObject(DLPlusContentType):
         # allowed limit.
         # https://stackoverflow.com/a/4013418/8587602
         if len(text.encode("utf-8")) > MAXIMUM_TEXT_LIMIT:
-            raise DLPlusObjectError(f"Text is longer than {MAXIMUM_TEXT_LIMIT} bytes")
+            msg = f"Text is longer than {MAXIMUM_TEXT_LIMIT} bytes"
+            raise DLPlusObjectError(msg)
 
         # DL Plus dummy objects always have their text set to an empty string
         if self.is_dummy():
@@ -814,12 +810,12 @@ class DLPlusObject(DLPlusContentType):
         self.is_delete = delete
 
         #: The creation time stamp of the DL Plus object in UTC
-        self.creation_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        self.creation_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)  # noqa: DTZ003
 
         #: The expiration (deletion) time stamp of the DL Plus object in UTC
         self.expiration_ts = None
 
-    def expire(self):
+    def expire(self) -> None:
         """Set the expiration (deletion) time stamp to the current time in UTC.
 
         This method should be called if the current DL Plus object gets updated
@@ -827,7 +823,7 @@ class DLPlusObject(DLPlusContentType):
         :attr:`expiration_ts` to a TZ aware :class:`datetime.datetime` object
         representing the current time in UTC.
         """
-        self.expiration_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+        self.expiration_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)  # noqa: DTZ003
 
     @classmethod
     def create_dummy(cls) -> DLPlusObject:
@@ -838,7 +834,6 @@ class DLPlusObject(DLPlusContentType):
 
         :return: Dummy DL Plus Object
         """
-
         return cls("DUMMY", "")
 
     def __str__(self) -> str:
@@ -872,7 +867,7 @@ class DLPlusTag(DLPlusContentType):
     1
     """
 
-    def __init__(self, content_type: str, start: int, length: int):
+    def __init__(self, content_type: str, start: int, length: int) -> None:
         """Create a class:`DLPlusTag` instance.
 
         Creates a new :class:`DLPlusTag` object with a specific content type
@@ -894,15 +889,16 @@ class DLPlusTag(DLPlusContentType):
         :raises DLPlusTagError: if either `start` or `length` are not a positive
                                 integer.
         """
-
         # Call the parent constructor which will assign self.content_type
         super().__init__(content_type)
 
         if not isinstance(start, int) or start < 0:
-            raise DLPlusTagError("start must be a positive integer")
+            msg = "start must be a positive integer"
+            raise DLPlusTagError(msg)
 
         if not isinstance(length, int) or length < 0:
-            raise DLPlusTagError("length must be a positive integer")
+            msg = "length must be a positive integer"
+            raise DLPlusTagError(msg)
 
         # Dummy objects always have their start and length marker set to 0
         if self.is_dummy():
@@ -940,25 +936,25 @@ class DLPlusTag(DLPlusContentType):
         :param DLPlusMessage dlp_message: The populated DL Plus message
         :return: DL Plus Tag
         """
-
         # Pythonic factory class method according to:
         # * https://stackoverflow.com/a/14992545
         # * https://stackoverflow.com/a/12179752
 
         if not isinstance(dlp_message, DLPlusMessage):
-            raise DLPlusTagError("dlp_message has to be a DLPlusMessage")
+            msg = "dlp_message has to be a DLPlusMessage"
+            raise DLPlusTagError(msg)
 
         if content_type not in CONTENT_TYPES:
-            raise DLPlusContentTypeError(f"Invalid content_type: {content_type}")
+            msg = f"Invalid content_type: {content_type}"
+            raise DLPlusContentTypeError(msg)
 
         # Check that a DLPlusObject object for the requested content type
         # was added and is available.
         try:
             dlp_object = dlp_message.get_dlp_objects()[content_type]
         except KeyError as key_error:
-            raise DLPlusTagError(
-                f"No DLPlusObject for content type {content_type} available"
-            ) from key_error
+            msg = f"No DLPlusObject for content type {content_type} available"
+            raise DLPlusTagError(msg) from key_error
 
         # Get the start marker (index) of the DL Plus object's text
         start = dlp_message.message.find(dlp_object.text)
@@ -980,5 +976,4 @@ class DLPlusTag(DLPlusContentType):
 
         :return: Dummy DL Plus Tag
         """
-
         return cls("DUMMY", 0, 0)

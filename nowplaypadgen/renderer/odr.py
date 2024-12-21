@@ -7,26 +7,25 @@ specifies the dynamic segments to be encoded into the mux.
 More documentation on the odr-padenc format is available from <TODO>.
 """
 
+from typing import Self
+
 from nowplaypadgen.dlplus import DLPlusMessage
 
 
 class ODRPadEncRenderer:
     """Manage ODR-padenc format."""
 
-    def __init__(self, message: DLPlusMessage):
+    def __init__(self, message: DLPlusMessage) -> None:
         """Create :class:`ODRPadEncRenderer` instance."""
         self._message = message
         super().__init__()
 
     @property
-    def message(self):
-        """Return messsage.
-
-        :returns: `DLPlusMessage`
-        """
+    def message(self: Self) -> DLPlusMessage:
+        """Return messsage."""
         return self._message
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Render :class:`ODRPadEncRenderer` as a odr-padenc style string.
 
         @TODO ensure this matches what odr-padenc expects.
