@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # nowplaypadgen documentation build configuration file, created by
 # sphinx-quickstart on Thu Aug 31 22:55:28 2017.

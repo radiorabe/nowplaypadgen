@@ -1,0 +1,33 @@
+# [ruff](https://docs.astral.sh/ruff/) config
+#
+# templated with https://github.com/radiorabe/backstage-software-templates
+
+extend-exclude = ["docs"]
+
+[lint]
+select = ["ALL"]
+ignore = [
+	"COM812",  # ignored due to conflict with formatter
+	"D203",    # we prefer blank-line-before-class (D211) for black compat
+	"D213",    # we prefer multi-line-summary-first-line (D212)
+	"FIX002",  # we do annotate needed fixes in-code and are ignoring this, hoping to reactive it once it can be downgraded to a warning
+	"ISC001",  # ignored due to conflict with formatter
+]
+
+[lint.per-file-ignores]
+"tests/**/*.py" = [
+	"D",       # pydocstyle is optional for tests
+	"ANN",     # flake8-annotations are optional for tests
+	"S101",    # assert is allow in tests
+	"S105",    # tests may have hardcoded secrets
+	"S106",    # tests may have hardcoded passwords
+	"S108",    # /tmp is allowed in tests since it's expected to be mocked
+	"DTZ00",   # tests often run in UTC
+	"INP001",  # tests do not need a dunder init
+]
+"**/__init__.py" = [
+	"D104",    # dunder init does not need a docstring because it might be empty
+]
+"docs/gen_ref_pages.py" = [
+	"INP001",  # mkdocs does not need a dunder init
+]

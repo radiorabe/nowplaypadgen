@@ -1,21 +1,9 @@
 repos:
-  - repo: local
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: 'v0.8.4'
     hooks:
-      - id: black
-        name: black
-        language: system
-        entry: black
-        types: [python]
-      - id: isort
-        name: isort
-        language: system
-        entry: isort
-        types: [python]
-      - id: flake8
-        name: flake8
-        language: system
-        entry: flake8
-        types: [python]
+      - id: ruff
+      - id: ruff-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
     hooks:

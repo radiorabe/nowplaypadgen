@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Test :class:`DLPlusMessage`."""
 
 import pytest
@@ -155,9 +154,10 @@ def test_maximum_dlp_objects(dlp_msg):
         DLPlusObject("ITEM.COMPOSITION", "composition"),
     ]
 
+    for dlp_object in dlp_objects_list[:4]:
+        dlp_msg.add_dlp_object(dlp_object)
     with pytest.raises(DLPlusMessageError) as dlplus_message_error:
-        for dlp_object in dlp_objects_list:
-            dlp_msg.add_dlp_object(dlp_object)
+        dlp_msg.add_dlp_object(dlp_objects_list[-1])
 
     expected_msg = "Only a maximum of 4 DLPlusObject objects can be added"
     assert expected_msg in str(dlplus_message_error)
@@ -200,21 +200,24 @@ def test_maximum_dlp_tags(dlp_msg):
         DLPlusTag("ITEM.COMPOSITION", 48, 10),
     ]
 
+    for dlp_tag in dlp_tags_list[:4]:
+        dlp_msg.add_dlp_tag(dlp_tag)
     with pytest.raises(DLPlusMessageError) as dlplus_message_error:
-        for dlp_tag in dlp_tags_list:
-            dlp_msg.add_dlp_tag(dlp_tag)
+        dlp_msg.add_dlp_tag(dlp_tags_list[-1])
 
     expected_msg = "Only a maximum of 4 DLPlusTag objects can be added"
     assert expected_msg in str(dlplus_message_error)
 
 
-def test_parse_message(
-    dlp_msg, dlp_title_tag, dlp_artist_tag, title, artist
-):  # pylint: disable=too-many-arguments
+def test_parse_message(dlp_msg, dlp_title_tag, dlp_artist_tag, title, artist):  # pylint: disable=too-many-arguments
     """Test the parsing of a DL Plus message."""
 
-    dlp_msg.add_dlp_tag(dlp_title_tag)
-    dlp_msg.add_dlp_tag(dlp_artist_tag)
+    dlp_tags = [
+        dlp_title_tag,
+        dlp_artist_tag,
+    ]
+    for tag in dlp_tags:
+        dlp_msg.add_dlp_tag(tag)
 
     dlp_msg.parse(f"Now playing: {title} - {artist}")
 
@@ -222,7 +225,7 @@ def test_parse_message(
 
     # A dictionary with two DLPlusObject objects is expected.
     assert isinstance(dlp_objects, dict)
-    assert len(dlp_objects) == 2
+    assert len(dlp_objects) == len(dlp_tags)
 
     assert "ITEM.TITLE" in dlp_objects
     assert dlp_objects["ITEM.TITLE"].text == title
@@ -254,7 +257,7 @@ def test_dlp_delete_object(dlp_msg):
     assert dlp_objects[content_type].is_delete
 
 
-def test_build_message(
+def test_build_message(  # noqa: PLR0913
     dlp_msg,
     dlp_title_obj,
     dlp_artist_obj,
@@ -265,11 +268,15 @@ def test_build_message(
     title_length,
     title,
     artist,
-):  # pylint: disable=too-many-arguments
+):  # ruff: noqa: PLR0913
     """Test the building of a DL Plus message."""
 
-    dlp_msg.add_dlp_object(dlp_title_obj)
-    dlp_msg.add_dlp_object(dlp_artist_obj)
+    dlp_objects = [
+        dlp_title_obj,
+        dlp_artist_obj,
+    ]
+    for obj in dlp_objects:
+        dlp_msg.add_dlp_object(obj)
 
     dlp_msg.build(format_string)
 
@@ -280,7 +287,7 @@ def test_build_message(
 
     # A dictionary with two DLPlusTag objects is expected.
     assert isinstance(dlp_tags, dict)
-    assert len(dlp_tags) == 2
+    assert len(dlp_tags) == len(dlp_objects)
 
     # Test that the start and length markers are correct
     assert "ITEM.ARTIST" in dlp_tags

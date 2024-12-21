@@ -1,8 +1,10 @@
 """Set up nowplaypadgen."""
 
+from pathlib import Path
+
 from setuptools import find_packages, setup
 
-with open("requirements.txt", encoding="utf-8") as f:
+with Path("requirements.txt").open() as f:
     requirements = f.read().splitlines()
 
 

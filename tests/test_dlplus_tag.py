@@ -123,9 +123,9 @@ def test_from_message_invalid_content_type():
 def test_from_message_missing_content_type():
     """Test the creation of a DLPlusTag object with a missing content type."""
 
+    message = DLPlusMessage()
+    message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio RaBe"))
     with pytest.raises(DLPlusTagError) as dlplus_tag_error:
-        message = DLPlusMessage()
-        message.add_dlp_object(DLPlusObject("STATIONNAME.LONG", "Radio RaBe"))
         DLPlusTag.from_message(message, "ITEM.TITLE")
 
     expected_msg = "No DLPlusObject for content type ITEM.TITLE available"
