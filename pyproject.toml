@@ -16,8 +16,8 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.12"
-mutagen = "^1.47"
-pytz = "^2024.2"
+mutagen = ">=1.47.0"
+pytz = ">=2024.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3"
