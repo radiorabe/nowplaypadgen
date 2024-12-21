@@ -1,0 +1,16 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: nowplaypadgen
+  title: Python nowplaypadgen
+  description: |
+    DAB+ now playing PAD (DLS+ generator)
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    github.com/project-slug: radiorabe/nowplaypadgen
+spec:
+  type: service
+  lifecycle: production
+  owner: it-reaktion
+  system: rabe-songticker
