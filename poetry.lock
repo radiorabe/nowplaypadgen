@@ -1056,14 +1056,14 @@ files = [
 
 [[package]]
 name = "types-setuptools"
-version = "77.0.2.20250328"
+version = "78.1.0.20250329"
 description = "Typing stubs for setuptools"
 optional = false
 python-versions = ">=3.9"
 groups = ["dev"]
 files = [
-    {file = "types_setuptools-77.0.2.20250328-py3-none-any.whl", hash = "sha256:034fb89e346fc8b19be25b73c304b64bd8d7e6a4f7a20d21be38ee67f8ed081d"},
-    {file = "types_setuptools-77.0.2.20250328.tar.gz", hash = "sha256:0d4d03c89ef34a4a81e19ee797ed1ea4496ef787524e03b40dcf91ba0328e8f5"},
+    {file = "types_setuptools-78.1.0.20250329-py3-none-any.whl", hash = "sha256:ea47eab891afb506f470eee581dcde44d64dc99796665da794da6f83f50f6776"},
+    {file = "types_setuptools-78.1.0.20250329.tar.gz", hash = "sha256:31e62950c38b8cc1c5114b077504e36426860a064287cac11b9666ab3a483234"},
 ]
 
 [package.dependencies]
@@ -1133,4 +1133,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "eaaaa9b7071310851d6928bdb9ad36ae0038c065ceb21e6d61034baf6fb23c1b"
+content-hash = "a7d18855d7e263da9ed1333d5ab37c71437d14224103dec11056091856eea5c7"
