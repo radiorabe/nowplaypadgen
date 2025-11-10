@@ -37,9 +37,9 @@ mkdocs-literate-nav = "^0.6.1"
 mkdocs-section-index = "^0.3.9"
 mkdocstrings-python = "^1.12.2"
 
-[tool.pytest.ini_options]
-minversion = "7.2"
-addopts = "-ra -q --random-order --doctest-glob='*.md' --doctest-modules --cov=nowplaypadgen --cov-fail-under=100 --ruff --ruff-format --ignore docs"
+[tool.pytest]
+minversion = "9.0"
+addopts = ["-ra", "-q", "--random-order", "--doctest-glob='*.md'", "--doctest-modules", "--cov=nowplaypadgen", "--cov-fail-under=100", "--ruff", "--ruff-format", "--ignore docs"]
 
 [build-system]
 requires = ["poetry-core"]
