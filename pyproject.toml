@@ -20,7 +20,7 @@ mutagen = ">=1.47.0"
 pytz = ">=2024.2.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3"
+pytest = ">=8.3,<10.0"
 pytest-cov = ">=6,<8"
 pytest-env = "^1.1"
 pytest-random-order = "^1.1"
