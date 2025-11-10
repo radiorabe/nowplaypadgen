@@ -39,7 +39,7 @@ mkdocstrings-python = "^1.12.2"
 
 [tool.pytest]
 minversion = "9.0"
-addopts = ["-ra", "-q", "--random-order", "--doctest-glob='*.md'", "--doctest-modules", "--cov=nowplaypadgen", "--cov-fail-under=100", "--ruff", "--ruff-format", "--ignore docs"]
+addopts = ["-ra", "-q", "--random-order", "--doctest-glob='*.md'", "--doctest-modules", "--cov=nowplaypadgen", "--cov-fail-under=100", "--ruff", "--ruff-format", "--ignore=docs"]
 
 [build-system]
 requires = ["poetry-core"]
