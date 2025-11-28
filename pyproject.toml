@@ -35,7 +35,7 @@ mkdocs-autorefs = "^1.2.0"
 mkdocs-gen-files = "^0.5.0"
 mkdocs-literate-nav = "^0.6.1"
 mkdocs-section-index = "^0.3.9"
-mkdocstrings-python = "^1.12.2"
+mkdocstrings-python = ">=1.12.2,<3.0.0"
 
 [tool.pytest]
 minversion = "9.0"
