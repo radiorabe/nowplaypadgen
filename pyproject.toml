@@ -17,7 +17,6 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.12"
 mutagen = ">=1.47.0"
-pytz = ">=2024.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3,<10.0"
@@ -27,7 +26,6 @@ pytest-random-order = "^1.1"
 pytest-ruff = ">=0.4,<0.6"
 ruff = ">=0.8,<0.16"
 types-mock = "^5.1"
-types-pytz = ">=2024.2,<2027.0"
 types-setuptools = ">=75.6,<83.0"
 mkdocs = "^1.6.1"
 mkdocs-material = "^9.5.49"

@@ -32,18 +32,17 @@ class Show(timeperiod.TimePeriod):
 
     In this example we set our hour long show to have finished an hour ago.
 
-    >>> import pytz
-    >>> from datetime import datetime, timedelta
+    >>> from datetime import datetime, timedelta, timezone
     >>>
-    >>> sh.starttime = datetime.now(tz=pytz.utc) - timedelta(hours=2)
-    >>> sh.endtime = datetime.now(tz=pytz.utc) - timedelta(hours=1)
+    >>> sh.starttime = datetime.now(tz=timezone.utc) - timedelta(hours=2)
+    >>> sh.endtime = datetime.now(tz=timezone.utc) - timedelta(hours=1)
     >>>
     >>> sh.active()
     False
 
     Now we change the end time so that the show ends in an hour.
 
-    >>> sh.endtime = datetime.now(tz=pytz.utc) + timedelta(hours=1)
+    >>> sh.endtime = datetime.now(tz=timezone.utc) + timedelta(hours=1)
     >>>
     >>> sh.active()
     True
