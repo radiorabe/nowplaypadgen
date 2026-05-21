@@ -3,7 +3,6 @@
 import datetime
 
 import pytest
-import pytz
 
 from nowplaypadgen.dlplus import DLPlusContentType, DLPlusObject, DLPlusObjectError
 
@@ -33,7 +32,7 @@ def test_instance_creation(content_type, text):
     assert isinstance(dlp_object.creation_ts, datetime.datetime)
 
     # Assure that a TZ aware UTC datetime object is available
-    assert dlp_object.creation_ts.tzinfo == pytz.utc
+    assert dlp_object.creation_ts.tzinfo == datetime.timezone.utc
     assert dlp_object.creation_ts.tzinfo.utcoffset(dlp_object.creation_ts) is not None
 
 
@@ -69,11 +68,11 @@ def test_delete_object(content_type, text):
     dlp_object.expire()
 
     # Assure that a TZ aware UTC datetime object is available
-    assert dlp_object.expiration_ts.tzinfo == pytz.utc
+    assert dlp_object.expiration_ts.tzinfo == datetime.timezone.utc
     assert dlp_object.creation_ts.tzinfo.utcoffset(dlp_object.creation_ts) is not None
 
     # Assure that the datetime object was set correctly
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
     assert dlp_object.expiration_ts <= now
 
 
