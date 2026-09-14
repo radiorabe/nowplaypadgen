@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import datetime
 
-import pytz
-
 
 class TimePeriodError(Exception):
     """TimePeriod related exception."""
@@ -56,8 +54,7 @@ class TimePeriod:
 
         # UTC will be used internally to simplify date and time
         # arithmetic and avoid common problems with DST boundaries.
-        # See also http://pytz.sourceforge.net/
-        starttime = starttime.astimezone(pytz.utc)
+        starttime = starttime.astimezone(datetime.timezone.utc)
 
         if self.endtime is not None:
             if starttime > self.endtime:
@@ -97,8 +94,7 @@ class TimePeriod:
 
         # UTC will be used internally to simplify date and time
         # arithmetic and avoid common problems with DST boundaries.
-        # See also http://pytz.sourceforge.net/
-        endtime = endtime.astimezone(pytz.utc)
+        endtime = endtime.astimezone(datetime.timezone.utc)
 
         if self.starttime is not None:
             if endtime < self.starttime:
@@ -175,7 +171,7 @@ class TimePeriod:
         """
         return (
             self._starttime is not None
-            and datetime.datetime.now(pytz.utc) >= self._starttime
+            and datetime.datetime.now(datetime.timezone.utc) >= self._starttime
         )
 
     def ended(self) -> bool:
@@ -185,7 +181,7 @@ class TimePeriod:
         """
         return (
             self._endtime is not None
-            and datetime.datetime.now(pytz.utc) >= self._endtime
+            and datetime.datetime.now(datetime.timezone.utc) >= self._endtime
         )
 
     def active(self) -> bool:
@@ -201,8 +197,8 @@ class TimePeriod:
         """Return a string representation of the period, useful for logging.
 
         >>> p = TimePeriod()
-        >>> p.starttime = datetime.datetime(2013, 1, 1, 13, 12, 0, tzinfo=pytz.utc)
-        >>> p.endtime = datetime.datetime(2113, 1, 1, 13, 12, 0, tzinfo=pytz.utc)
+        >>> p.starttime = datetime.datetime(2013, 1, 1, 13, 12, 0, tzinfo=datetime.timezone.utc)
+        >>> p.endtime = datetime.datetime(2113, 1, 1, 13, 12, 0, tzinfo=datetime.timezone.utc)
         >>> print(p)
         nowplaypadgen.timeperiod start: 2013-01-01 13:12:00+00:00, end: 2113-01-01 13:12:00+00:00, duration: 36524 days, 0:00:00
 

@@ -34,8 +34,10 @@ def test_content_type_code():
     content_types_to_codes = [
         ("DUMMY", 0),
         ("ITEM.TITLE", 1),
+        ("ITEM.GENRE", 11),
         ("INFO.NEWS", 12),
         ("STATIONNAME.SHORT", 31),
+        ("PROGRAMME.FREQUENCY", 38),
         ("PHONE.HOTLINE", 41),
         ("DESCRIPTOR.PLACE", 59),
     ]
