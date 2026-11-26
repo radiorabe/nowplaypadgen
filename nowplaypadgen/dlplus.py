@@ -50,8 +50,6 @@ import datetime
 from string import Template
 from typing import TypedDict
 
-import pytz
-
 from nowplaypadgen.util import Error
 
 # @TODO: - Add support for item toggle and running bit
@@ -145,7 +143,7 @@ CONTENT_TYPES: dict[str, _ContentType] = {
         "id3v1": "COMMENT",
         "id3v2": "COMM",
     },
-    "ITEM.GENRE ": {
+    "ITEM.GENRE": {
         "code": 11,
         "category": CATEGORIES[1],
         "id3v1": "CONTENTTYPE",
@@ -267,7 +265,7 @@ CONTENT_TYPES: dict[str, _ContentType] = {
         "id3v1": None,
         "id3v2": None,
     },
-    "PROGRAMME.FREQUENCY ": {
+    "PROGRAMME.FREQUENCY": {
         "code": 38,
         "category": CATEGORIES[3],
         "id3v1": None,
@@ -810,7 +808,7 @@ class DLPlusObject(DLPlusContentType):
         self.is_delete = delete
 
         #: The creation time stamp of the DL Plus object in UTC
-        self.creation_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)  # noqa: DTZ003
+        self.creation_ts = datetime.datetime.now(datetime.timezone.utc)
 
         #: The expiration (deletion) time stamp of the DL Plus object in UTC
         self.expiration_ts = None
@@ -823,7 +821,7 @@ class DLPlusObject(DLPlusContentType):
         :attr:`expiration_ts` to a TZ aware :class:`datetime.datetime` object
         representing the current time in UTC.
         """
-        self.expiration_ts = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)  # noqa: DTZ003
+        self.expiration_ts = datetime.datetime.now(datetime.timezone.utc)
 
     @classmethod
     def create_dummy(cls) -> DLPlusObject:

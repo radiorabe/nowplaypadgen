@@ -1,9 +1,9 @@
 """Test :class:`TimePeriod`."""
 
 import datetime
+from zoneinfo import ZoneInfo
 
 import pytest
-import pytz
 
 from nowplaypadgen.timeperiod import TimePeriod, TimePeriodError
 
@@ -17,10 +17,12 @@ def fixture_period():
 def test_date_assignment(period):
     """Test the time setter and getter decorators."""
 
-    period.starttime = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
+    period.starttime = datetime.datetime(
+        2017, 8, 30, 21, 0, 0, 0, datetime.timezone.utc
+    )
     assert isinstance(period.starttime, datetime.datetime)
 
-    period.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
+    period.endtime = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, datetime.timezone.utc)
     assert isinstance(period.endtime, datetime.datetime)
 
 
@@ -57,25 +59,25 @@ def test_start_date_utc_conversion(period):
 
     # Create localized start and end times
     zone_name = "Europe/Zurich"
-    zurich_tz = pytz.timezone(zone_name)
-    start = zurich_tz.localize(datetime.datetime(2017, 8, 30, 21, 0, 0, 0))
-    end = zurich_tz.localize(datetime.datetime(2017, 8, 30, 22, 0, 0, 0))
-    assert zone_name == start.tzinfo.zone
-    assert zone_name == end.tzinfo.zone
+    zurich_tz = ZoneInfo(zone_name)
+    start = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, tzinfo=zurich_tz)
+    end = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, tzinfo=zurich_tz)
+    assert start.tzinfo.key == zone_name
+    assert end.tzinfo.key == zone_name
 
     period.starttime = start
     period.endtime = end
 
     # Start and end times must be converted to UTC internally
-    assert period.starttime.tzinfo.zone == "UTC"
-    assert period.endtime.tzinfo.zone == "UTC"
+    assert period.starttime.tzinfo == datetime.timezone.utc
+    assert period.endtime.tzinfo == datetime.timezone.utc
 
 
 def test_end_not_before_start_date(period):
     """Test that an end date can't be before a start date."""
 
-    start = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
-    end = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
+    start = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, datetime.timezone.utc)
+    end = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, datetime.timezone.utc)
 
     period.starttime = start
 
@@ -89,8 +91,8 @@ def test_end_not_before_start_date(period):
 def test_start_after_end_date(period):
     """Test that a start date can't be after and end date."""
 
-    start = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, pytz.utc)
-    end = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, pytz.utc)
+    start = datetime.datetime(2017, 8, 30, 22, 0, 0, 0, datetime.timezone.utc)
+    end = datetime.datetime(2017, 8, 30, 21, 0, 0, 0, datetime.timezone.utc)
 
     period.endtime = end
 
@@ -104,7 +106,7 @@ def test_start_after_end_date(period):
 def test_period_has_started(period):
     """Test that a period has started."""
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     period.starttime = now
     period.endtime = now + datetime.timedelta(hours=1)  # plus one hour
@@ -117,7 +119,7 @@ def test_period_has_started(period):
 def test_period_has_not_started(period):
     """Test that a period hasn't started yet."""
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     period.starttime = now + datetime.timedelta(hours=1)  # plus one hour
     period.endtime = now + datetime.timedelta(hours=2)  # plus two hours
@@ -129,7 +131,7 @@ def test_period_has_not_started(period):
 def test_period_has_ended(period):
     """Test that a period has ended."""
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     period.starttime = now - datetime.timedelta(hours=2)  # minus two hours
     period.endtime = now - datetime.timedelta(hours=1)  # minus one hour
@@ -141,7 +143,7 @@ def test_period_has_ended(period):
 def test_period_has_not_ended(period):
     """Test that a period hasn't ended yet."""
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     period.starttime = now
     period.endtime = now + datetime.timedelta(hours=1)  # plus one hour
@@ -153,7 +155,7 @@ def test_period_has_not_ended(period):
 def test_get_period_duration(period):
     """Test get duration (time delta) of a period."""
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     # The period spans one hour
     period.starttime = now
@@ -194,7 +196,7 @@ def test_duration_must_be_positive(period):
 def test_duration_already_defined(period):
     """Test that a duration can't be changed."""
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
 
     # This should automatically set the duration, as a start and end time is
     # known by the period
@@ -210,7 +212,7 @@ def test_duration_already_defined(period):
 def test_duration_sets_endtime(period):
     """Test that a duration will set a currently unknown end time."""
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
     duration = datetime.timedelta(hours=1)
 
     period.starttime = now
@@ -222,7 +224,7 @@ def test_duration_sets_endtime(period):
 def test_duration_sets_starttime(period):
     """Test that a duration will set a currently unknown start time."""
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
     duration = datetime.timedelta(hours=1)
 
     period.endtime = now

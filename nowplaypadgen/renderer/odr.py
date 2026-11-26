@@ -1,4 +1,4 @@
-"""Convert to ODR-padenc style string prepresentation of Dynamic Label Plus strings.
+"""Convert to ODR-padenc style string representation of Dynamic Label Plus strings.
 
 This module generates a string/file that may be used with odr-padenc. odr-padenc
 expects ether a simple DLS string or a string prefixed with a DLS header that
@@ -22,13 +22,11 @@ class ODRPadEncRenderer:
 
     @property
     def message(self: Self) -> DLPlusMessage:
-        """Return messsage."""
+        """Return message."""
         return self._message
 
     def __str__(self) -> str:
         """Render :class:`ODRPadEncRenderer` as a odr-padenc style string.
-
-        @TODO ensure this matches what odr-padenc expects.
 
         Simple non labeled strings are output as is.
 
